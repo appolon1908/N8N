@@ -71,10 +71,15 @@ and exits 1 when any installation check is blocked; it exits 0 only when all
 installation checks pass. A mismatched or dirty checkout stops host inventory.
 
 The tool compares installed wrapper, sudo policy, and recovery helper bytes with
-the selected checkout, checks their root ownership and modes, checks configuration
+the selected commit's regular Git blobs, checks their root ownership and modes,
+checks configuration
 metadata without reading its contents, inventories the four operator evidence
 files, and invokes `visudo -cf` only for an exact matching sudo policy. It rejects
 symlinks and nonregular files and never prints file contents or raw command errors.
+All expected source files are resolved before host inventory; unavailable commit
+objects stop the check. Policy syntax validation uses the same commit bytes as
+the installed-file comparison. Git replacement objects and worktree conversion
+filters are excluded from the authority reads.
 It neither invokes sudo nor grants installation authority. A delegated account
 without read access receives BLOCKED; the authorized root operator can perform
 these read-only checks without adding a new sudo rule.

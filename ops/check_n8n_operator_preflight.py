@@ -76,6 +76,8 @@ def run_check(command, *, cwd=None):
 
 
 def source_identity(expected_sha):
+    if not re.fullmatch('[0-9a-f]{40}', expected_sha):
+        return {'status': 'BLOCKED', 'reason': 'SOURCE_IDENTITY_UNVERIFIED'}
     head = run_check(['git', 'rev-parse', 'HEAD'], cwd=ROOT)
     dirty = run_check(['git', 'status', '--porcelain', '--untracked-files=all'], cwd=ROOT)
     passed = (head is not None and head.returncode == 0
@@ -85,25 +87,51 @@ def source_identity(expected_sha):
             'reason': 'EXACT_CLEAN_CHECKOUT' if passed else 'SOURCE_IDENTITY_UNVERIFIED'}
 
 
+def read_source_bytes(expected_sha, source):
+    """Read a regular blob from the selected commit, without worktree filters."""
+    if not re.fullmatch('[0-9a-f]{40}', expected_sha):
+        raise OSError('SOURCE_UNREADABLE')
+    try:
+        entry = subprocess.run(
+            ['git', '--no-replace-objects', 'ls-tree', '-z', expected_sha, '--', source],
+            cwd=ROOT, capture_output=True, timeout=15, check=False)
+        metadata, path = entry.stdout.rstrip(b'\0').split(b'\t', 1)
+        mode, kind, oid = metadata.split()
+        if (entry.returncode != 0 or mode not in (b'100644', b'100755')
+                or kind != b'blob' or path != source.encode('utf-8')
+                or re.fullmatch(b'[0-9a-f]{40}', oid) is None):
+            raise ValueError
+        blob = subprocess.run(
+            ['git', '--no-replace-objects', 'cat-file', 'blob', oid.decode('ascii')],
+            cwd=ROOT, capture_output=True, timeout=15, check=False)
+        if blob.returncode != 0 or not blob.stdout:
+            raise ValueError
+        return blob.stdout
+    except (OSError, subprocess.TimeoutExpired, ValueError):
+        raise OSError('SOURCE_UNREADABLE') from None
+
+
 def collect(expected_sha):
     checks = {'source': source_identity(expected_sha)}
-    # Source mismatch stops before using checkout bytes as installation authority.
+    # Resolve all authority bytes before inspecting any installed host artifact.
     if checks['source']['status'] != 'PASS':
         return report(checks)
+    sources = [source for _, source, _, _ in INSTALLATIONS]
+    sources.extend('operations/backup/' + name for name in HELPERS)
+    try:
+        expected_sources = {source: read_source_bytes(expected_sha, source)
+                            for source in sources}
+        policy = expected_sources[INSTALLATIONS[1][1]].decode('utf-8')
+    except (OSError, UnicodeError):
+        checks['source_artifacts'] = {'status': 'BLOCKED', 'reason': 'SOURCE_UNREADABLE'}
+        return report(checks)
+    checks['source_artifacts'] = {'status': 'PASS', 'reason': 'EXACT_COMMIT_BLOBS'}
     for name, source, installed, mode in INSTALLATIONS:
-        try:
-            expected = (ROOT / source).read_bytes()
-        except OSError:
-            checks[name] = {'status': 'BLOCKED', 'reason': 'SOURCE_UNREADABLE'}
-            continue
+        expected = expected_sources[source]
         checks[name] = inspect_file(Path(installed), modes={mode},
                                     root_owned=True, expected=expected)
     for name in HELPERS:
-        try:
-            expected = (ROOT / 'operations/backup' / name).read_bytes()
-        except OSError:
-            checks[name] = {'status': 'BLOCKED', 'reason': 'SOURCE_UNREADABLE'}
-            continue
+        expected = expected_sources['operations/backup/' + name]
         checks[name] = inspect_file(Path('/opt/codestra/operations/backup') / name,
                                     modes={0o500, 0o700, 0o755}, root_owned=True,
                                     expected=expected)
@@ -114,7 +142,6 @@ def collect(expected_sha):
         checks[name] = inspect_file(Path('/home/codestra-admin') / name)
     # Validate syntax only after the installed policy matches the exact source.
     if checks['sudoers']['status'] == 'PASS':
-        policy = (ROOT / INSTALLATIONS[1][1]).read_text()
         rules = [line for line in policy.splitlines() if line and not line.startswith('#')]
         syntax = run_check(['/usr/sbin/visudo', '-cf', INSTALLATIONS[1][2]])
         passed = rules == [RULE] and syntax is not None and syntax.returncode == 0
