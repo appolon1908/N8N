@@ -37,6 +37,13 @@ source "$config"
 : "${N8N_PRODUCTION_RESTORE_PGPASSFILE:?N8N_PRODUCTION_RESTORE_PGPASSFILE is required}"
 : "${N8N_STAGING_RESTORE_URL:?N8N_STAGING_RESTORE_URL is required}"
 : "${N8N_STAGING_RESTORE_PGPASSFILE:?N8N_STAGING_RESTORE_PGPASSFILE is required}"
+: "${CODESTRA_DATABASE_BACKUP_GPG_HOME:?CODESTRA_DATABASE_BACKUP_GPG_HOME is required}"
+: "${CODESTRA_DATABASE_BACKUP_GPG_SIGNING_FINGERPRINT:?CODESTRA_DATABASE_BACKUP_GPG_SIGNING_FINGERPRINT is required}"
+
+# Plain assignments in the reviewed environment file must reach child helpers.
+export CODESTRA_DATABASE_BACKUP_GPG_HOME CODESTRA_DATABASE_BACKUP_GPG_SIGNING_FINGERPRINT
+export N8N_RECOVERY_WORK_ROOT N8N_PRODUCTION_RESTORE_URL N8N_PRODUCTION_RESTORE_PGPASSFILE
+export N8N_STAGING_RESTORE_URL N8N_STAGING_RESTORE_PGPASSFILE
 
 export CODESTRA_EXPECTED_RELEASE_SHA="$CODESTRA_RELEASE_SHA"
 export CODESTRA_EXPECTED_N8N_PRODUCTION_IMAGE_DIGEST="$CODESTRA_N8N_PRODUCTION_IMAGE_DIGEST"
@@ -50,6 +57,13 @@ backup_stamp=$(tr -d '\r\n' <"$backup_root/LAST_SUCCESS")
 [[ "$backup_stamp" =~ ^20[0-9]{6}T[0-9]{6}Z$ ]] || fail "latest backup marker is invalid"
 recovery_dir="$backup_root/$backup_stamp"
 
+# The freshness helper authenticates STATUS.txt. Check the approved tuple even
+# when an existing restore result lets us skip the restore verifier.
+status_value() { sed -n "s/^$1=//p" "$recovery_dir/STATUS.txt"; }
+[[ "$(status_value RELEASE_SHA)" == "$CODESTRA_EXPECTED_RELEASE_SHA" ]] || fail "backup release SHA mismatch"
+[[ "$(status_value PRODUCTION_IMAGE_DIGEST)" == "$CODESTRA_EXPECTED_N8N_PRODUCTION_IMAGE_DIGEST" ]] || fail "backup production image digest mismatch"
+[[ "$(status_value STAGING_IMAGE_DIGEST)" == "$CODESTRA_EXPECTED_N8N_STAGING_IMAGE_DIGEST" ]] || fail "backup staging image digest mismatch"
+
 restored_stamp=""
 if [[ -f "$evidence_root/LAST_SUCCESS" && ! -L "$evidence_root/LAST_SUCCESS" ]]; then
   restored_stamp=$(tr -d '\r\n' <"$evidence_root/LAST_SUCCESS")
@@ -59,5 +73,14 @@ if [[ "$restored_stamp" != "$backup_stamp" ]]; then
 fi
 "$recovery_check" "$evidence_root" "$max_age_seconds"
 [[ "$(tr -d '\r\n' <"$evidence_root/LAST_SUCCESS")" == "$backup_stamp" ]] || fail "restore evidence is not bound to the latest backup"
+
+result="$evidence_root/RESTORE-RESULT-$backup_stamp"
+result_value() { sed -n "s/^$1=//p" "$result"; }
+archive_digest=$(sha256sum -- "$recovery_dir/n8n-recovery-$backup_stamp.tar.gz.gpg" | awk '{print $1}')
+[[ "$(result_value BACKUP_SHA256)" == "$archive_digest" ]] || fail "restore evidence backup checksum mismatch"
+[[ "$(result_value RELEASE_SHA)" == "$CODESTRA_EXPECTED_RELEASE_SHA" ]] || fail "restore evidence release SHA mismatch"
+[[ "$(result_value PRODUCTION_IMAGE_DIGEST)" == "$CODESTRA_EXPECTED_N8N_PRODUCTION_IMAGE_DIGEST" ]] || fail "restore evidence production image digest mismatch"
+[[ "$(result_value STAGING_IMAGE_DIGEST)" == "$CODESTRA_EXPECTED_N8N_STAGING_IMAGE_DIGEST" ]] || fail "restore evidence staging image digest mismatch"
+[[ "$(result_value TARGET_CLASS)" == "ISOLATED" ]] || fail "restore evidence target class is not isolated"
 
 printf 'N8N_DATABASE_CERTIFICATION=PASS\nBACKUP_STAMP=%s\nRESTORE_TARGET_CLASS=ISOLATED\nLIVE_DATABASES_TOUCHED=NO\n' "$backup_stamp"

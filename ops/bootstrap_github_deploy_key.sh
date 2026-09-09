@@ -194,7 +194,7 @@ if [[ "$MATCH_COUNT" -eq 1 ]]; then
   DEPLOY_KEY_ID="$(jq -r '.[0].id' <<<"$MATCHES")"
   [[ "$(jq -r '.[0].read_only' <<<"$MATCHES")" == "true" ]] \
     || fail "existing GitHub deploy key has write access"
-  [[ "$(jq -r '.[0].enabled // true' <<<"$MATCHES")" == "true" ]] \
+  [[ "$(jq -r '.[0] | if has("enabled") then .enabled else true end' <<<"$MATCHES")" == "true" ]] \
     || fail "existing GitHub deploy key is disabled"
   printf 'GITHUB_DEPLOY_KEY=ALREADY_PRESENT_READ_ONLY\n'
 else
@@ -221,7 +221,7 @@ gh api \
   "repos/${REPOSITORY}/keys/${DEPLOY_KEY_ID}" >"$API_RESPONSE_PATH"
 [[ "$(jq -r '.read_only' "$API_RESPONSE_PATH")" == "true" ]] \
   || fail "GitHub deploy-key read-only readback failed"
-[[ "$(jq -r '.enabled // true' "$API_RESPONSE_PATH")" == "true" ]] \
+[[ "$(jq -r 'if has("enabled") then .enabled else true end' "$API_RESPONSE_PATH")" == "true" ]] \
   || fail "GitHub deploy key is disabled"
 READBACK_MATERIAL="$(
   jq -r '.key' "$API_RESPONSE_PATH" | awk 'NF >= 2 {print $1 " " $2; exit}'

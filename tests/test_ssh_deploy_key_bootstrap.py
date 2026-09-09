@@ -173,10 +173,17 @@ PY
                   exit 0
                 fi
                 if [[ " $* " == *"/keys/123"* ]]; then
-                  cat "$FAKE_GH_STATE"
+                  if [[ "${FAKE_DISABLED:-false}" == true ]]; then
+                    jq '.enabled = false' "$FAKE_GH_STATE"
+                  else
+                    cat "$FAKE_GH_STATE"
+                  fi
                   exit 0
                 fi
                 if [[ " $* " == *"keys?per_page=100"* ]]; then
+                  if [[ "${FAKE_EXISTING:-false}" == true ]]; then
+                    jq '.enabled = false' "$FAKE_GH_STATE"
+                  fi
                   exit 0
                 fi
                 exit 2
@@ -223,6 +230,20 @@ PY
             self.assertEqual("appolon1908-hue/N8N", evidence["ssh_authenticated_repository"])
             self.assertFalse(evidence["application_deployed"])
             self.assertFalse(evidence["workflow_imported"])
+
+            for existing in (False, True):
+                with self.subTest(disabled_existing_key=existing):
+                    evidence_path.unlink(missing_ok=True)
+                    environment['FAKE_DISABLED'] = 'true'
+                    environment['FAKE_EXISTING'] = str(existing).lower()
+                    disabled = subprocess.run(
+                        ['bash', str(SCRIPT)], capture_output=True, text=True,
+                        env=environment, timeout=30,
+                    )
+                    self.assertNotEqual(disabled.returncode, 0)
+                    self.assertIn('deploy key is disabled', disabled.stderr)
+                    self.assertNotIn('SSH_DEPLOY_KEY_BOOTSTRAP=PASS', disabled.stdout)
+                    self.assertFalse(evidence_path.exists())
 
 
 if __name__ == "__main__":
