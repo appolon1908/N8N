@@ -61,3 +61,27 @@ resolve during the read-only connection attempt. Host installation and runtime
 checks were not performed. The original recovery and deploy-key source PRs (#55
 and #51) were already merged at baseline commit
 `0e300df832c56600b864bb8a54afde8919e05daf`.
+
+## Read-only installation preflight
+
+From a clean checkout of the reviewed, protected-merged commit on the target host,
+run `python3 ops/check_n8n_operator_preflight.py --expected-source-sha SHA`, replacing
+`SHA` with that independently selected full commit SHA. The command returns JSON
+and exits 1 when any installation check is blocked; it exits 0 only when all
+installation checks pass. A mismatched or dirty checkout stops host inventory.
+
+The tool compares installed wrapper, sudo policy, and recovery helper bytes with
+the selected checkout, checks their root ownership and modes, checks configuration
+metadata without reading its contents, inventories the four operator evidence
+files, and invokes `visudo -cf` only for an exact matching sudo policy. It rejects
+symlinks and nonregular files and never prints file contents or raw command errors.
+It neither invokes sudo nor grants installation authority. A delegated account
+without read access receives BLOCKED; the authorized root operator can perform
+these read-only checks without adding a new sudo rule.
+
+`installation_preflight=PASS` is only an installation inventory result. Evidence
+file presence does not authenticate a signed tuple or reconcile the active runtime.
+The tool does not inspect effective sudo privileges, validate restore credentials,
+execute the certifier, bootstrap a key, or run workflows. Its three certification
+fields remain `NOT_RUN`. Complete the remaining gates above before closing #3,
+#52, or #56; do not use the JSON inventory as production certification evidence.
