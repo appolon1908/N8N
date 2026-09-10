@@ -10,28 +10,39 @@
   {{template "codestra-styles" .}}
 </head>
 <body>
-  <div class="shell">
-    {{template "codestra-brand" .}}
-    <main>
-      <section class="card" aria-labelledby="access-title">
-        <p class="eyebrow">Automation workspace</p>
-        {{if eq .StatusCode 403}}
-        <h1 id="access-title">Access required</h1>
-        <p class="intro">Your account does not have access to this workspace. Contact your Codestra administrator if you need access.</p>
-        {{else if eq .StatusCode 401}}
-        <h1 id="access-title">Sign in again</h1>
-        <p class="intro">Your session has ended. Sign in to return to your workspace.</p>
-        {{else}}
-        <h1 id="access-title">Temporarily unavailable</h1>
-        <p class="intro">We could not open the workspace. Please try again shortly.</p>
-        {{end}}
-        <form method="GET" action="{{.ProxyPrefix}}/sign_in">
-          <input type="hidden" name="rd" value="{{.Redirect}}">
-          <button type="submit">Return to sign in <span aria-hidden="true">→</span></button>
-        </form>
-      </section>
-    </main>
-    <footer>Authorized operators only.</footer>
+  <div class="codestra-shell">
+    <section class="auth-panel">
+      <div class="auth-inner">
+        {{template "codestra-brand" .}}
+        <main>
+          <section class="card" aria-labelledby="access-title">
+            <p class="eyebrow">Automation workspace</p>
+            {{if eq .StatusCode 403}}
+            <h1 id="access-title">Access required</h1>
+            <p class="intro">Your account does not have access to this workspace. Contact your Codestra administrator if you need access.</p>
+            {{else if eq .StatusCode 401}}
+            <h1 id="access-title">Sign in again</h1>
+            <p class="intro">Your session has ended. Sign in to return to your workspace.</p>
+            {{else}}
+            <h1 id="access-title">Temporarily unavailable</h1>
+            <p class="intro">We could not open the workspace. Please try again shortly.</p>
+            {{end}}
+            <form method="GET" action="{{.ProxyPrefix}}/sign_in">
+              <input type="hidden" name="rd" value="{{.Redirect}}">
+              <button type="submit">Return to sign in <span aria-hidden="true">→</span></button>
+            </form>
+          </section>
+        </main>
+        <div class="operator-note">Authorized operators only.</div>
+      </div>
+    </section>
+    <aside class="welcome" aria-label="Codestra Automation welcome">
+      <div class="welcome-copy">
+        Secure by design
+        <span>Codestra keeps identity, role, and workspace access checks at the authentication boundary.</span>
+      </div>
+      <footer>Powered by Codestra LLC · © 2026 Codestra LLC. All rights reserved.</footer>
+    </aside>
   </div>
 </body>
 </html>
