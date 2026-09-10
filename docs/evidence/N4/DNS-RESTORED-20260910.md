@@ -9,7 +9,7 @@ The existing GoDaddy API integration on provider host `37.27.128.39` restored th
 
 Both narrowly scoped writes returned HTTP 200. GoDaddy readback confirms the two records, and all 39 previous zone records are unchanged. A protected before/after snapshot, plan, and verification evidence are retained on the execution host at the path in the adjacent JSON record.
 
-The first propagation check showed the new addresses on ns25.domaincontrol.com and partial visibility on public resolvers. ns26.domaincontrol.com still returned NXDOMAIN during that initial check. This does not establish complete propagation.
+At 11:17:18 UTC, both authoritative nameservers (ns25.domaincontrol.com and ns26.domaincontrol.com) and both checked public resolvers (1.1.1.1 and 8.8.8.8) returned 65.109.65.169 for both names. All eight DNS checks passed.
 
 DNS repair does not certify the editor rollout. An HTTPS probe directed to the core server still failed its TLS handshake for both hostnames. The N8N/Keycloak v1 hostname contract and the Caddy v2 automation hostname contract also require reviewed reconciliation. The existing runtime, authentication gates, and workflow activation states were not changed.
 

@@ -34,8 +34,20 @@
   "secret_material_included": false,
   "rollback_backup_on_execution_host": "/var/backups/codestra/godaddy-n8n-dns/20260910T111259Z",
   "remaining": [
-    "Complete authoritative and recursive DNS propagation.",
     "Deploy and verify the reviewed Caddy/Kong/Keycloak editor configuration.",
     "Reconcile n8n and automation editor-host contracts through their owning repositories."
-  ]
+  ],
+  "dns_verification": {
+    "checked_at": "2026-09-10T11:17:18Z",
+    "authoritative_nameservers": [
+      "ns25.domaincontrol.com",
+      "ns26.domaincontrol.com"
+    ],
+    "recursive_resolvers": [
+      "1.1.1.1",
+      "8.8.8.8"
+    ],
+    "both_names_resolve_to": "65.109.65.169",
+    "all_eight_checks": "PASS"
+  }
 }
