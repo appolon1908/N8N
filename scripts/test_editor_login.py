@@ -100,6 +100,7 @@ def main():
             check(status == 200, "login_status")
             page = Page(login)
             check("Sign in to n8n" in login and "Continue with Codestra" in login, "login_branding")
+            check("#f4c223" in login and "#07080a" in login and "#55d6be" not in login, "codestra_black_gold_palette")
             check(page.forms == [{"method": "GET", "action": "/oauth2/start"}], "login_form_action")
             check(page.inputs == [{"type": "hidden", "name": "rd", "value": "/workflow/example?tab=canvas&view=details"}], "return_path_preserved")
             check(not page.scripts and 'type="password"' not in login, "no_local_credentials_or_scripts")
