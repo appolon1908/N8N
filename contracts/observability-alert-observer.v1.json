@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "status": "SOURCE_ONLY",
+  "workflow_key": "codestra.observability.alert-status-observer.v1",
+  "purpose": "Observe governed alert lifecycle and escalation state without owning notification delivery",
+  "ingress": {
+    "authority": "codestra-middleware",
+    "transport": "private authenticated event handoff",
+    "allowed_event_types": [
+      "observability.alert.accepted.v1",
+      "observability.alert.delivery-status.v1",
+      "observability.alert.reconciliation-required.v1"
+    ],
+    "public_webhook": false
+  },
+  "processing": {
+    "redact_secrets": true,
+    "deduplication": "event_id_plus_semantic_body_digest",
+    "preserve": [
+      "tenant_id",
+      "event_id",
+      "correlation_id",
+      "alert_fingerprint",
+      "state",
+      "severity",
+      "service",
+      "environment",
+      "message_id",
+      "delivery_status"
+    ],
+    "external_effects": false
+  },
+  "egress": {
+    "allowed_targets": [
+      "codestra-middleware"
+    ],
+    "direct_klyrow": false,
+    "direct_postal": false,
+    "direct_smtp": false,
+    "direct_telnexa": false,
+    "direct_jasmin": false
+  },
+  "delivery_authority": {
+    "owner": "appolon1908-hue/Middleware-",
+    "provider": "appolon1908-hue/klyrow.com",
+    "recipient_policy": "fixed in Middleware config/observability-alert-policy.v1.json",
+    "n8n_may_override_recipient": false
+  },
+  "activation": {
+    "active_in_git": false,
+    "independent_approval_required": true,
+    "production_activation_separate": true,
+    "sms_live_delivery_required": false
+  }
+}
