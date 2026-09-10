@@ -100,6 +100,8 @@ def main():
             check(status == 200, "login_status")
             page = Page(login)
             check("Sign in to n8n" in login and "Continue with Codestra" in login, "login_branding")
+            check(all(token in login for token in ("#0b0b0b", "#171717", "#a1a1aa", "--button:#fff")), "black_white_visual_contract")
+            check(all(token not in login for token in ("#07111f", "#0f1d2e", "#55d6be", "radial-gradient")), "retired_palette_absent")
             check(page.forms == [{"method": "GET", "action": "/oauth2/start"}], "login_form_action")
             check(page.inputs == [{"type": "hidden", "name": "rd", "value": "/workflow/example?tab=canvas&view=details"}], "return_path_preserved")
             check(not page.scripts and 'type="password"' not in login, "no_local_credentials_or_scripts")
@@ -121,7 +123,7 @@ def main():
                 args.render_dir.mkdir(parents=True, exist_ok=True)
                 (args.render_dir / "sign-in.html").write_text(login)
                 (args.render_dir / "access-required.html").write_text(error)
-            print(json.dumps({"EDITOR_LOGIN_RENDER": "PASS", "checks": 15, "gateway_image": IMAGE,
+            print(json.dumps({"EDITOR_LOGIN_RENDER": "PASS", "checks": 17, "gateway_image": IMAGE,
                               "network": "none", "published_ports": 0, "production_login_verified": False}))
         finally:
             subprocess.run(["docker", "rm", "--force", name], capture_output=True, timeout=20)
