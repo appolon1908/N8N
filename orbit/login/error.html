@@ -1,0 +1,38 @@
+{{define "error.html"}}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>Workspace access · Codestra</title>
+  {{template "codestra-styles" .}}
+</head>
+<body>
+  <div class="shell">
+    {{template "codestra-brand" .}}
+    <main>
+      <section class="card" aria-labelledby="access-title">
+        <p class="eyebrow">Automation workspace</p>
+        {{if eq .StatusCode 403}}
+        <h1 id="access-title">Access required</h1>
+        <p class="intro">Your account does not have access to this workspace. Contact your Codestra administrator if you need access.</p>
+        {{else if eq .StatusCode 401}}
+        <h1 id="access-title">Sign in again</h1>
+        <p class="intro">Your session has ended. Sign in to return to your workspace.</p>
+        {{else}}
+        <h1 id="access-title">Temporarily unavailable</h1>
+        <p class="intro">We could not open the workspace. Please try again shortly.</p>
+        {{end}}
+        <form method="GET" action="{{.ProxyPrefix}}/sign_in">
+          <input type="hidden" name="rd" value="{{.Redirect}}">
+          <button type="submit">Return to sign in <span aria-hidden="true">→</span></button>
+        </form>
+      </section>
+    </main>
+    <footer>Authorized operators only.</footer>
+  </div>
+</body>
+</html>
+{{end}}

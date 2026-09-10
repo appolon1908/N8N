@@ -10,6 +10,7 @@ catalog-reconciliation:
 
 operator-adoption:
 	python3 scripts/validate_operator_adoption.py
+	python3 scripts/test_editor_login.py
 
 deploy-key-bootstrap:
 	python3 scripts/validate_ssh_deploy_key_bootstrap.py
