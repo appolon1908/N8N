@@ -1,6 +1,6 @@
-.PHONY: validate repository catalog-reconciliation operator-adoption deploy-key-bootstrap policy-tests workflows secrets compose runtime-status ruleset-contract platform-control-plane v2-client-cells
+.PHONY: validate repository catalog-reconciliation operator-adoption deploy-key-bootstrap policy-tests workflows secrets compose runtime-status ruleset-contract platform-control-plane observability-control-plane v2-client-cells
 
-validate: repository catalog-reconciliation operator-adoption deploy-key-bootstrap policy-tests workflows secrets compose runtime-status ruleset-contract platform-control-plane v2-client-cells
+validate: repository catalog-reconciliation operator-adoption deploy-key-bootstrap policy-tests workflows secrets compose runtime-status ruleset-contract platform-control-plane observability-control-plane v2-client-cells
 
 repository:
 	python3 scripts/validate_repository.py
@@ -37,6 +37,9 @@ ruleset-contract:
 
 platform-control-plane:
 	python3 scripts/validate_platform_control_plane.py
+
+observability-control-plane:
+	python3 scripts/validate_observability_control_plane.py
 
 v2-client-cells:
 	python3 scripts/validate_v2_client_cells.py
