@@ -7,8 +7,10 @@ egress_policy: deploy/egress/n8n-egress-policy.v1.json
 endpoint:
   authority: Caddy -> Kong -> Middleware
   base_url: https://api.codestra.co
-  command_route: POST /v1/integrations/n8n/commands
-  operation_route: GET /v1/integrations/n8n/operations/{command_id}
+  command_route: POST /v2/automation/commands
+  operation_route: GET /v2/automation/commands/{command_id}
+  result_submit_route: POST /api/v1/integrations/n8n/results
+  result_read_route: GET /api/v1/integrations/n8n/results/{event_id}
   direct_private_middleware_listener_allowed: false
   direct_provider_endpoints_allowed: false
 credential:
@@ -19,7 +21,7 @@ credential:
   grant_type: clientCredentials
   keycloak_client_id: n8n-automation
   audience: middleware-api
-  scopes: [middleware.request.forward, middleware.status.read]
+  scopes: [automation.command.read, n8n.results.read, n8n.results.submit]
   source: root-owned-bootstrap-secret-files
   embedded_in_workflow_json: false
 editor_policy:

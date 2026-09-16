@@ -130,7 +130,7 @@ def main() -> int:
     surface_operations = {
         (item.get("method"), item.get("path"))
         for item in surface.get("operations", [])
-        if isinstance(item, dict)
+        if isinstance(item, dict) and str(item.get("path", "")).startswith("/v2/automation/")
     }
     if surface.get("command_endpoint") != CANONICAL_COMMAND_PATH:
         fail("middleware surface command endpoint drifted")
@@ -140,6 +140,16 @@ def main() -> int:
         fail("middleware surface must declare one canonical command path")
     if any((method, path) in surface_operations for method in ("POST", "GET") for path in LEGACY_PATHS):
         fail("legacy n8n command routes remain in the allowed workflow surface")
+    result_operations = {
+        (item.get("method"), item.get("path"), item.get("scope"))
+        for item in surface.get("operations", [])
+        if isinstance(item, dict) and str(item.get("path", "")).startswith("/api/v1/integrations/n8n/results")
+    }
+    if result_operations != {
+        ("POST", "/api/v1/integrations/n8n/results", "n8n.results.submit"),
+        ("GET", "/api/v1/integrations/n8n/results/{event_id}", "n8n.results.read"),
+    }:
+        fail("canonical n8n result submit/read surface drifted")
 
     boundary = contract.get("middleware_to_odoo", {})
     expected_boundary = {

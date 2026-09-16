@@ -1,0 +1,93 @@
+{
+  "name": "shared.submit-integration-result.v2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "4cc60bba-52c4-4ad4-8af6-8aad16b8b701",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-500, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "result-01", "name": "job_id", "value": "UNBOUND_JOB_ID", "type": "string"},
+            {"id": "result-02", "name": "lease_token", "value": "UNBOUND_LEASE_TOKEN", "type": "string"},
+            {"id": "result-03", "name": "event_id", "value": "EVT-TEST-SYN-0001", "type": "string"},
+            {"id": "result-04", "name": "workflow_key", "value": "test-syn.certification", "type": "string"},
+            {"id": "result-05", "name": "execution_id", "value": "UNBOUND_EXECUTION_ID", "type": "string"},
+            {"id": "result-06", "name": "tenant_id", "value": "TEST_SYN_TENANT", "type": "string"},
+            {"id": "result-07", "name": "correlation_id", "value": "={{$execution.id}}", "type": "string"},
+            {"id": "result-08", "name": "causation_id", "value": "={{$execution.id}}", "type": "string"},
+            {"id": "result-09", "name": "idempotency_key", "value": "={{'result:' + $json.event_id + ':' + $execution.id}}", "type": "string"},
+            {"id": "result-10", "name": "status", "value": "COMPLETED", "type": "string"},
+            {"id": "result-11", "name": "actions", "value": "={{ [] }}", "type": "array"},
+            {"id": "result-12", "name": "completed_at", "value": "={{$now.toISO()}}", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "19059eaa-d317-4ef1-89cf-1367e294f027",
+      "name": "Prepare Integration Result",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-250, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/api/v1/integrations/n8n/results",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "={{$json.authorization}}"},
+            {"name": "X-Tenant-ID", "value": "={{$json.tenant_id}}"},
+            {"name": "X-Request-ID", "value": "={{$json.correlation_id}}"},
+            {"name": "X-Correlation-ID", "value": "={{$json.correlation_id}}"},
+            {"name": "Idempotency-Key", "value": "={{$json.idempotency_key}}"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({event_id:$json.event_id,correlation_id:$json.correlation_id,idempotency_key:$json.idempotency_key,workflow_key:$json.workflow_key,execution_id:$json.execution_id,status:$json.status,actions:$json.actions,completed_at:$json.completed_at})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "a1433f13-62fa-4b5d-af37-ac81f71dc0ac",
+      "name": "Submit Result Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [20, 0],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {"main": [[{"node": "Prepare Integration Result", "type": "main", "index": 0}]]},
+    "Prepare Integration Result": {"main": [[{"node": "Submit Result Through Middleware", "type": "main", "index": 0}]]}
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {"executionOrder": "v1", "saveDataSuccessExecution": "none", "saveManualExecutions": false},
+  "versionId": "ef1f5df1-7afb-4764-a0aa-1fd41b7fc437",
+  "meta": {
+    "codestra": {
+      "shared_runtime": true,
+      "contract_version": 2,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS",
+      "effects": "DRY_RUN_ONLY",
+      "timeout_semantics": "READ_RESULT_STATE_BEFORE_RETRY",
+      "automatic_retry_on_timeout": false,
+      "promotion_blockers": [
+        "replace UNBOUND job, lease, execution and credential context",
+        "prove exact n8n.results.submit scope and idempotent replay",
+        "prove provider and Odoo writes remain disabled"
+      ]
+    }
+  },
+  "tags": []
+}

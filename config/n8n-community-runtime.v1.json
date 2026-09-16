@@ -178,6 +178,29 @@
           "X-Request-ID",
           "X-Correlation-ID"
         ]
+      },
+      {
+        "method": "POST",
+        "path": "/api/v1/integrations/n8n/results",
+        "scope": "n8n.results.submit",
+        "required_headers": [
+          "Authorization",
+          "X-Tenant-ID",
+          "X-Request-ID",
+          "X-Correlation-ID",
+          "Idempotency-Key"
+        ]
+      },
+      {
+        "method": "GET",
+        "path": "/api/v1/integrations/n8n/results/{event_id}",
+        "scope": "n8n.results.read",
+        "required_headers": [
+          "Authorization",
+          "X-Tenant-ID",
+          "X-Request-ID",
+          "X-Correlation-ID"
+        ]
       }
     ]
   },
@@ -203,7 +226,9 @@
       "automation.approval.read",
       "automation.operations.replay.request",
       "automation.operations.reconcile",
-      "automation.capability.read"
+      "automation.capability.read",
+      "n8n.results.submit",
+      "n8n.results.read"
     ],
     "secret_source": "root-owned-bootstrap-secret-files",
     "secret_material_in_repository": false,
