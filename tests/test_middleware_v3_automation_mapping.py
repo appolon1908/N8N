@@ -44,7 +44,7 @@ class MiddlewareV3AutomationMappingTests(unittest.TestCase):
         self.assertEqual(mapping["extends"], SURFACE.name)
         self.assertEqual(mapping["authority"]["gateway_host"], self.surface["production_gateway_host"])
         self.assertEqual(mapping["authority"]["canonical_upstream"], "middleware-integration-api:8095")
-        self.assertIn("appolon-middleware-integration-api:8080", mapping["authority"]["forbidden_upstreams"])
+        self.assertIn("appolon-middleware-integration-api", mapping["authority"]["retired_upstream_aliases"])
         self.assertEqual(mapping["activation"]["blocked_on"], "BLOCKED_ON_MIDDLEWARE_V3_FINAL_SHA")
         for key, (method, path) in KERNEL.items():
             with self.subTest(route=key):
@@ -97,7 +97,7 @@ class MiddlewareV3AutomationMappingTests(unittest.TestCase):
                     self.assertNotIn("/platform/v1/commands", text)
                     self.assertNotIn("/platform/v1/operations", text)
                     self.assertNotIn("/platform/v1/kernel", text)
-                    self.assertNotIn(":8080", text)
+                    self.assertNotIn("appolon-middleware-integration-api", text)
 
     def test_client_id_discrepancy_is_recorded_not_hidden(self) -> None:
         identity = self.mapping["identity"]
