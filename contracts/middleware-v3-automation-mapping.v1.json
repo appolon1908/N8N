@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "codestra.n8n-middleware-v3-automation-mapping",
+  "status": "V3_PENDING_FINAL_MIDDLEWARE_CONTRACT",
+  "V3_PENDING_FINAL_MIDDLEWARE_CONTRACT": true,
+  "runtime_apply_authorized": false,
+  "extends": "middleware-surface.v1.json",
+  "role": {
+    "n8n": "workflow executor",
+    "middleware": "command / policy / safety / idempotency / status / audit / reconciliation authority",
+    "rule": "N8N never becomes command authority. Every governed effect N8N wants performed is submitted to Middleware; N8N never writes to a provider or to Odoo business state directly."
+  },
+  "authority": {
+    "middleware_repository": "ingtrader21-spec/Middleware-",
+    "middleware_source_sha": "22d023a9c65b0789a0f7ee6c28548753521a9eff",
+    "middleware_edge_contract_sha256": "be25ea3a15687616fc1a17c451bb731c9e8bb85bbbd970e563d2baedc062b99e",
+    "gateway_host": "api.codestra.co",
+    "canonical_upstream": "middleware-integration-api:8095",
+    "forbidden_upstreams": ["appolon-middleware-integration-api:8080", "middleware:8080"]
+  },
+  "identity": {
+    "keycloak_client_id": "n8n-automation",
+    "control_plane_contract_client_id": "n8n-crm-automation",
+    "client_id_discrepancy": "contracts/platform-control-plane.v1.json names n8n-crm-automation; Keycloak config/clients defines n8n-automation. Owner decision required before activation; recorded, not resolved here.",
+    "audience": "middleware-api",
+    "grant_type": "client_credentials",
+    "current_submit_scope": "automation.command.crm",
+    "current_read_scope": "automation.command.read",
+    "v3_scope_submit": "platform.command",
+    "v3_scope_read": "platform.command.read",
+    "v3_scope_replay": "platform.command.replay",
+    "v3_replay_realm_role": "platform-operator",
+    "required_headers": ["Authorization", "X-Tenant-ID", "X-Request-ID", "X-Correlation-ID", "Idempotency-Key"]
+  },
+  "v3_kernel_routes": {
+    "submit": {"method": "POST", "path": "/platform/v1/commands", "response": "202 + Location: /platform/v1/operations/{operation_id}"},
+    "status": {"method": "GET", "path": "/platform/v1/operations/{operation_id}"},
+    "timeline": {"method": "GET", "path": "/platform/v1/operations/{operation_id}/timeline"},
+    "cancel": {"method": "POST", "path": "/platform/v1/operations/{operation_id}/cancel"},
+    "replay": {"method": "POST", "path": "/platform/v1/operations/{operation_id}/replay"},
+    "describe": {"method": "GET", "path": "/platform/v1/kernel/describe"}
+  },
+  "executor_transport": {
+    "rule": "The durable job primitives are the Middleware → N8N executor transport (attest_target, reserve_delivery, submit_reserved, status/readback in Middleware). The V3 N8N adapter reuses them unchanged; they are not replaced by kernel routes.",
+    "operations": [
+      "POST /v2/automation/jobs/claim",
+      "GET /v2/automation/jobs/{job_id}",
+      "POST /v2/automation/jobs/{job_id}/heartbeat",
+      "POST /v2/automation/jobs/{job_id}/steps",
+      "POST /v2/automation/jobs/{job_id}/complete",
+      "POST /v2/automation/jobs/{job_id}/fail",
+      "POST /v2/automation/jobs/reconcile"
+    ]
+  },
+  "operations": [
+    {"method": "POST", "path": "/v2/automation/jobs/claim", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "GET", "path": "/v2/automation/jobs/{job_id}", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "POST", "path": "/v2/automation/jobs/{job_id}/heartbeat", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "POST", "path": "/v2/automation/jobs/{job_id}/steps", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "POST", "path": "/v2/automation/jobs/{job_id}/complete", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false, "note": "result delivery to Middleware; Middleware readback decides completion"},
+    {"method": "POST", "path": "/v2/automation/jobs/{job_id}/fail", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "POST", "path": "/v2/automation/commands", "v3_state": "MAPS_TO_V3_SUBMIT", "v3_route": "POST /platform/v1/commands", "effectful": true, "note": "a workflow that needs a governed effect (crm.*, message.send, call.*) submits a V3 command; Middleware policy, safety, capability and idempotency decide; N8N reads the operation, never the provider"},
+    {"method": "GET", "path": "/v2/automation/commands/{command_id}", "v3_state": "MAPS_TO_V3_STATUS", "v3_route": "GET /platform/v1/operations/{operation_id}", "effectful": false},
+    {"method": "POST", "path": "/v2/automation/approvals", "v3_state": "STAYS_WORKFLOW_PRIMITIVE", "v3_route": null, "effectful": false, "note": "human approval is a workflow primitive; a V3 command may carry the approval reference in its envelope"},
+    {"method": "GET", "path": "/v2/automation/approvals/{approval_id}", "v3_state": "STAYS_WORKFLOW_PRIMITIVE", "v3_route": null, "effectful": false},
+    {"method": "POST", "path": "/v2/automation/dead-letters/{dead_letter_id}/replay", "v3_state": "MAPS_TO_V3_REPLAY", "v3_route": "POST /platform/v1/operations/{operation_id}/replay", "effectful": true, "note": "requires platform.command.replay and the platform-operator realm role on the verified token"},
+    {"method": "POST", "path": "/v2/automation/jobs/reconcile", "v3_state": "EXECUTOR_TRANSPORT_REUSED", "v3_route": null, "effectful": false},
+    {"method": "GET", "path": "/v2/automation/capabilities/{capability}", "v3_state": "MAPS_TO_V3_DESCRIBE", "v3_route": "GET /platform/v1/kernel/describe", "effectful": false}
+  ],
+  "prohibited": {
+    "n8n_to_provider_privileged_write": false,
+    "n8n_to_odoo_business_effect": false,
+    "workflow_targets_v3_kernel_before_freeze": false,
+    "legacy_command_paths": ["/v1/integrations/n8n/commands", "/v1/integrations/n8n/operations/{command_id}", "/v1/integrations/n8n/operations/"]
+  },
+  "activation": {
+    "prerequisites": [
+      "MIDDLEWARE_V3_FINAL_SHA frozen with the six /platform/v1 kernel operations in deploy/public-api-route-contract.json",
+      "Kong re-vendored at that digest with the six routes activated",
+      "Keycloak platform.command / platform.command.read attached to the N8N service client (client id discrepancy resolved first)",
+      "workflow templates switched from POST /v2/automation/commands to POST /platform/v1/commands and from GET /v2/automation/commands/{command_id} to GET /platform/v1/operations/{operation_id}; middleware-surface.v1.json regenerated to list the kernel routes"
+    ],
+    "blocked_on": "BLOCKED_ON_MIDDLEWARE_V3_FINAL_SHA"
+  }
+}
