@@ -13,7 +13,7 @@ x-n8n-common: &n8n-common
     - no-new-privileges:true
   pids_limit: 256
   labels:
-    com.codestra.n8n.umbrella-guard-sha256: eae05f92c0a088168ff9c5080ad86a401becbfc1747422fa9b612619548dc6f7
+    com.codestra.n8n.umbrella-guard-sha256: d59dcb62ee53b4129334d45e9e6be26bf111c1efc7d93854b6a97469af030c7b
     com.codestra.n8n.write-boundary: disabled-source-only
   entrypoint:
     - /bin/sh
