@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0",
+  "workflow_id": "codestra.api-workstation.sync.v1",
+  "enabled": false,
+  "mode": "plan-only",
+  "authority": {
+    "source_registry": "appolon1908/Codestra-Workstation@development:config/api-workstation-registry.v1.json",
+    "runtime_effects": "Middleware V3 only"
+  },
+  "sources": [
+    "github",
+    "linear",
+    "notion",
+    "lucid"
+  ],
+  "operations": [
+    "read_registry",
+    "compare_links",
+    "compare_status_summaries",
+    "produce_reconciliation_plan",
+    "record_audit_result"
+  ],
+  "forbidden": [
+    "overwrite_source_code",
+    "modify_openapi_without_repository_commit",
+    "merge_or_deploy",
+    "activate_workflows",
+    "trigger_provider_effects",
+    "change_production_state"
+  ],
+  "idempotency_key": "workstation_id + source + entity_id + source_version",
+  "loop_prevention": "ignore updates carrying current reconciliation_id",
+  "failure_policy": "fail-visible; do not partially claim synchronized",
+  "links": {
+    "linear": "https://linear.app/passion-fruit/project/codestra-api-workstation-cross-repo-readiness-ac4681283417",
+    "notion": "https://app.notion.com/p/3ed7518c3e0681e79abdee00b136209d?pvs=204",
+    "lucid": "https://lucid.app/lucidchart/da85d1b4-a6db-4dff-9286-d66bdcd560db/view"
+  }
+}
