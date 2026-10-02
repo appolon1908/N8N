@@ -1,0 +1,124 @@
+{
+  "name": "core.api-workstation-sync-plan.v1",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "5f2f4120-6c51-4a5c-a7b7-4c14536aa001",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a001",
+              "name": "workstation_id",
+              "value": "codestra-api-workstation-v1",
+              "type": "string"
+            },
+            {
+              "id": "a002",
+              "name": "mode",
+              "value": "plan-only",
+              "type": "string"
+            },
+            {
+              "id": "a003",
+              "name": "live_effects",
+              "value": false,
+              "type": "boolean"
+            },
+            {
+              "id": "a004",
+              "name": "requested_by",
+              "value": "core.api-workstation-sync-plan.v1",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5f2f4120-6c51-4a5c-a7b7-4c14536aa002",
+      "name": "Prepare Sync Plan",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -260,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/reconcile",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify($json)}}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "5f2f4120-6c51-4a5c-a7b7-4c14536aa003",
+      "name": "Request Governed Reconciliation",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        20,
+        0
+      ],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Sync Plan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Sync Plan": {
+      "main": [
+        [
+          {
+            "node": "Request Governed Reconciliation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": false
+  },
+  "versionId": "5f2f4120-6c51-4a5c-a7b7-4c14536aa004",
+  "meta": {
+    "codestra": {
+      "shared_runtime": true,
+      "contract_version": 1,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS",
+      "effects": "NO_EFFECT_RECONCILIATION_PLAN",
+      "workstation_id": "codestra-api-workstation-v1"
+    }
+  },
+  "tags": []
+}
