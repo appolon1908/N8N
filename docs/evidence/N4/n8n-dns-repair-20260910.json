@@ -1,0 +1,53 @@
+{
+  "captured_at": "2026-09-10T11:14:03Z",
+  "change": "n8n-editor-dns-repair",
+  "zone": "codestra.co",
+  "provider": "GoDaddy",
+  "execution_host": "37.27.128.39",
+  "application_host": "65.109.65.169",
+  "records": [
+    {
+      "name": "n8n",
+      "type": "A",
+      "data": "65.109.65.169",
+      "ttl": 600
+    },
+    {
+      "name": "automation",
+      "type": "A",
+      "data": "65.109.65.169",
+      "ttl": 600
+    }
+  ],
+  "provider_write_http": [
+    200,
+    200
+  ],
+  "provider_readback": "PASS",
+  "previous_records_preserved": 39,
+  "result_record_count": 41,
+  "dns_changed": true,
+  "application_configuration_changed": false,
+  "application_tls_verified": false,
+  "editor_access_verified": false,
+  "workflow_activation_changed": false,
+  "secret_material_included": false,
+  "rollback_backup_on_execution_host": "/var/backups/codestra/godaddy-n8n-dns/20260910T111259Z",
+  "remaining": [
+    "Deploy and verify the reviewed Caddy/Kong/Keycloak editor configuration.",
+    "Reconcile n8n and automation editor-host contracts through their owning repositories."
+  ],
+  "dns_verification": {
+    "checked_at": "2026-09-10T11:17:18Z",
+    "authoritative_nameservers": [
+      "ns25.domaincontrol.com",
+      "ns26.domaincontrol.com"
+    ],
+    "recursive_resolvers": [
+      "1.1.1.1",
+      "8.8.8.8"
+    ],
+    "both_names_resolve_to": "65.109.65.169",
+    "all_eight_checks": "PASS"
+  }
+}
