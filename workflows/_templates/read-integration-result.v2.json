@@ -1,0 +1,83 @@
+{
+  "name": "shared.read-integration-result.v2",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "7b585a04-184f-4f58-ab20-50450c005196",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-500, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "read-01", "name": "job_id", "value": "UNBOUND_JOB_ID", "type": "string"},
+            {"id": "read-02", "name": "lease_token", "value": "UNBOUND_LEASE_TOKEN", "type": "string"},
+            {"id": "read-03", "name": "event_id", "value": "EVT-TEST-SYN-0001", "type": "string"},
+            {"id": "read-04", "name": "tenant_id", "value": "TEST_SYN_TENANT", "type": "string"},
+            {"id": "read-05", "name": "correlation_id", "value": "={{$execution.id}}", "type": "string"},
+            {"id": "read-06", "name": "causation_id", "value": "={{$execution.id}}", "type": "string"},
+            {"id": "read-07", "name": "idempotency_key", "value": "={{'result-read:' + $json.event_id + ':' + $execution.id}}", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "4bc03d0c-8d52-44c6-9367-65c1465cc840",
+      "name": "Prepare Result Read",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-250, 0]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://middleware.invalid/api/v1/integrations/n8n/results/{{$json.event_id}}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Authorization", "value": "={{$json.authorization}}"},
+            {"name": "X-Tenant-ID", "value": "={{$json.tenant_id}}"},
+            {"name": "X-Request-ID", "value": "={{$json.correlation_id}}"},
+            {"name": "X-Correlation-ID", "value": "={{$json.correlation_id}}"}
+          ]
+        },
+        "options": {"timeout": 10000}
+      },
+      "id": "d925af2d-7ec1-40f4-93f3-658d6cf4ec32",
+      "name": "Read Result Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [20, 0],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {"main": [[{"node": "Prepare Result Read", "type": "main", "index": 0}]]},
+    "Prepare Result Read": {"main": [[{"node": "Read Result Through Middleware", "type": "main", "index": 0}]]}
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {"executionOrder": "v1", "saveDataSuccessExecution": "none", "saveManualExecutions": false},
+  "versionId": "53b641b8-024e-4f88-a6f0-67e68873a7a1",
+  "meta": {
+    "codestra": {
+      "shared_runtime": true,
+      "contract_version": 2,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS",
+      "effects": "READ_ONLY",
+      "timeout_semantics": "READ_RESULT_STATE_BOUNDED_RETRY",
+      "automatic_retry_on_timeout": false,
+      "promotion_blockers": [
+        "replace UNBOUND job, lease and credential context",
+        "prove exact n8n.results.read scope and cross-tenant 404",
+        "prove provider and Odoo writes remain disabled"
+      ]
+    }
+  },
+  "tags": []
+}

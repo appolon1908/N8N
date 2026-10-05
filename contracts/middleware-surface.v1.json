@@ -232,6 +232,39 @@
       "responses": [200, 401, 403, 404, 429],
       "idempotency": "read only",
       "timeout": "safe bounded read retry"
+    },
+    {
+      "method": "POST",
+      "path": "/api/v1/integrations/n8n/results",
+      "scope": "n8n.results.submit",
+      "purpose": "Submit one durable automation result for Middleware validation and delivery",
+      "envelope_schema": "internal://middleware/submit_n8n_result/request/v1",
+      "required_headers": [
+        "Authorization",
+        "X-Tenant-ID",
+        "X-Request-ID",
+        "X-Correlation-ID",
+        "Idempotency-Key"
+      ],
+      "responses": [202, 400, 401, 403, 404, 409, 422, 429, 503],
+      "idempotency": "exact replay returns the original accepted result",
+      "timeout": "read result state before any resubmission"
+    },
+    {
+      "method": "GET",
+      "path": "/api/v1/integrations/n8n/results/{event_id}",
+      "scope": "n8n.results.read",
+      "purpose": "Read authoritative result delivery state",
+      "envelope_schema": null,
+      "required_headers": [
+        "Authorization",
+        "X-Tenant-ID",
+        "X-Request-ID",
+        "X-Correlation-ID"
+      ],
+      "responses": [200, 400, 401, 403, 404, 409, 422, 429, 503],
+      "idempotency": "read only",
+      "timeout": "safe bounded read retry"
     }
   ],
   "safety": {

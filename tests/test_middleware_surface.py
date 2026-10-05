@@ -53,7 +53,18 @@ class MiddlewareSurfaceTests(unittest.TestCase):
             ("POST", "/v2/automation/jobs/reconcile"),
             ("GET", "/v2/automation/capabilities/{capability}"),
         }
-        self.assertEqual(expected, set(self.operations))
+        actual = {
+            key for key in self.operations if key[1].startswith("/v2/automation/")
+        }
+        self.assertEqual(expected, actual)
+
+    def test_result_submit_and_read_pair_is_canonical(self) -> None:
+        submit = self.operations[("POST", "/api/v1/integrations/n8n/results")]
+        read = self.operations[("GET", "/api/v1/integrations/n8n/results/{event_id}")]
+        self.assertEqual("n8n.results.submit", submit["scope"])
+        self.assertEqual("n8n.results.read", read["scope"])
+        self.assertIn("Idempotency-Key", submit["required_headers"])
+        self.assertNotIn("Idempotency-Key", read["required_headers"])
 
     def test_claim_response_requires_lease_payload_and_correlation(self) -> None:
         contract = (

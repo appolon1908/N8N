@@ -99,6 +99,18 @@ EXPECTED_ROUTES = {
         "automation.capability.read",
         READ_HEADERS,
     ),
+    (
+        "POST",
+        "/api/v1/integrations/n8n/results",
+        "n8n.results.submit",
+        WRITE_HEADERS,
+    ),
+    (
+        "GET",
+        "/api/v1/integrations/n8n/results/{event_id}",
+        "n8n.results.read",
+        READ_HEADERS,
+    ),
 }
 EXPECTED_CREDENTIAL_SCOPES = {route[2] for route in EXPECTED_ROUTES}
 EXPECTED_ALLOWED_HOSTNAMES = {"api.codestra.co", "auth.codestra.co"}
