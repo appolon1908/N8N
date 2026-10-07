@@ -1,0 +1,23 @@
+{
+  "workstation": "n8n::n8-01-engine::03-persistence",
+  "product": "n8n",
+  "section": "n8-01-engine",
+  "subsection": "03-persistence",
+  "branch": "subsection/n8-01-engine--03-persistence",
+  "parent_branch": "section/n8-01-engine",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-01-engine/subsections/03-persistence/repo",
+  "depends_on": [
+    "n8n::n8-01-engine::02-execution-model"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "product": "n8n",
+  "repository": "appolon1908/N8N",
+  "promotion_chain": [
+    "subsection/*",
+    "section/*",
+    "development",
+    "testing",
+    "staging",
+    "production"
+  ],
+  "sections": [
+    {
+      "section": "n8-01-engine",
+      "branch": "section/n8-01-engine",
+      "depends_on": [],
+      "subsections": [
+        "01-runtime",
+        "02-execution-model",
+        "03-persistence"
+      ]
+    },
+    {
+      "section": "n8-02-api",
+      "branch": "section/n8-02-api",
+      "depends_on": [
+        "n8-01-engine"
+      ],
+      "subsections": [
+        "01-public-api",
+        "02-webhooks",
+        "03-openapi-postman"
+      ]
+    },
+    {
+      "section": "n8-03-workers",
+      "branch": "section/n8-03-workers",
+      "depends_on": [
+        "n8-01-engine",
+        "n8-02-api"
+      ],
+      "subsections": [
+        "01-queue",
+        "02-worker-ha",
+        "03-concurrency"
+      ]
+    },
+    {
+      "section": "n8-04-triggers",
+      "branch": "section/n8-04-triggers",
+      "depends_on": [
+        "n8-02-api",
+        "n8-03-workers"
+      ],
+      "subsections": [
+        "01-webhook-triggers",
+        "02-schedules",
+        "03-event-triggers"
+      ]
+    },
+    {
+      "section": "n8-05-credentials",
+      "branch": "section/n8-05-credentials",
+      "depends_on": [
+        "n8-01-engine"
+      ],
+      "subsections": [
+        "01-credential-model",
+        "02-openbao-integration",
+        "03-rotation"
+      ]
+    },
+    {
+      "section": "n8-06-connectors",
+      "branch": "section/n8-06-connectors",
+      "depends_on": [
+        "n8-02-api",
+        "n8-05-credentials"
+      ],
+      "subsections": [
+        "01-registry",
+        "02-provider-contracts",
+        "03-reconciliation"
+      ]
+    },
+    {
+      "section": "n8-07-tenancy-rbac",
+      "branch": "section/n8-07-tenancy-rbac",
+      "depends_on": [
+        "n8-03-workers",
+        "n8-05-credentials",
+        "n8-06-connectors"
+      ],
+      "subsections": [
+        "01-tenants",
+        "02-rbac",
+        "03-audit"
+      ]
+    },
+    {
+      "section": "n8-08-metering-quotas",
+      "branch": "section/n8-08-metering-quotas",
+      "depends_on": [
+        "n8-07-tenancy-rbac"
+      ],
+      "subsections": [
+        "01-usage-metering",
+        "02-quotas",
+        "03-plan-enforcement"
+      ]
+    },
+    {
+      "section": "n8-09-release",
+      "branch": "section/n8-09-release",
+      "depends_on": [
+        "n8-08-metering-quotas"
+      ],
+      "subsections": [
+        "01-observability",
+        "02-performance-dr",
+        "03-ci-certification"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+name: Codestra Hierarchy Governance
+on:
+  pull_request:
+    branches:
+      - main
+      - development
+      - testing
+      - staging
+      - production
+      - 'section/**'
+permissions:
+  contents: read
+jobs:
+  promotion-guard:
+    name: promotion-guard
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      HEAD_REF: ${{ github.head_ref }}
+      BASE_REF: ${{ github.base_ref }}
+    steps:
+      - name: Enforce promotion path
+        shell: bash
+        run: |
+          set -euo pipefail
+          head="$HEAD_REF"
+          base="$BASE_REF"
+          if [ "$head" = "governance/development-control-plane-v1" ] && [ "$base" = "main" ]; then
+            echo "PROMOTION_GUARD=PASS bootstrap"
+            exit 0
+          fi
+          case "$head:$base" in
+            subsection/*:section/*)
+              src="${head#subsection/}"
+              src="${src%%--*}"
+              dst="${base#section/}"
+              test "$src" = "$dst"
+              ;;
+            section/*:development|development:testing|testing:staging|staging:production)
+              ;;
+            *)
+              echo "PROMOTION_GUARD=BLOCK head=$head base=$base"
+              exit 1
+              ;;
+          esac
+          echo "PROMOTION_GUARD=PASS head=$head base=$base"

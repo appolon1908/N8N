@@ -1,0 +1,24 @@
+{
+  "workstation": "n8n::n8-05-credentials::03-rotation",
+  "product": "n8n",
+  "section": "n8-05-credentials",
+  "subsection": "03-rotation",
+  "branch": "subsection/n8-05-credentials--03-rotation",
+  "parent_branch": "section/n8-05-credentials",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-05-credentials/subsections/03-rotation/repo",
+  "depends_on": [
+    "n8n::n8-01-engine::03-persistence",
+    "n8n::n8-05-credentials::02-openbao-integration"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}
