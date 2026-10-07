@@ -1,0 +1,6 @@
+{
+  "prefix": "n8",
+  "testing": "testing/environment",
+  "staging": "staging",
+  "production": "production/environment"
+}
