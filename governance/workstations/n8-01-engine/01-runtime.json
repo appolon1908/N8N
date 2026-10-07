@@ -1,0 +1,21 @@
+{
+  "workstation": "n8n::n8-01-engine::01-runtime",
+  "product": "n8n",
+  "section": "n8-01-engine",
+  "subsection": "01-runtime",
+  "branch": "subsection/n8-01-engine--01-runtime",
+  "parent_branch": "section/n8-01-engine",
+  "order": 1,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-01-engine/subsections/01-runtime/repo",
+  "depends_on": [],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

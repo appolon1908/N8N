@@ -1,0 +1,26 @@
+{
+  "workstation": "n8n::n8-07-tenancy-rbac::02-rbac",
+  "product": "n8n",
+  "section": "n8-07-tenancy-rbac",
+  "subsection": "02-rbac",
+  "branch": "subsection/n8-07-tenancy-rbac--02-rbac",
+  "parent_branch": "section/n8-07-tenancy-rbac",
+  "order": 2,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-07-tenancy-rbac/subsections/02-rbac/repo",
+  "depends_on": [
+    "n8n::n8-03-workers::03-concurrency",
+    "n8n::n8-05-credentials::03-rotation",
+    "n8n::n8-06-connectors::03-reconciliation",
+    "n8n::n8-07-tenancy-rbac::01-tenants"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

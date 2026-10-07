@@ -1,0 +1,25 @@
+{
+  "workstation": "n8n::n8-03-workers::03-concurrency",
+  "product": "n8n",
+  "section": "n8-03-workers",
+  "subsection": "03-concurrency",
+  "branch": "subsection/n8-03-workers--03-concurrency",
+  "parent_branch": "section/n8-03-workers",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-03-workers/subsections/03-concurrency/repo",
+  "depends_on": [
+    "n8n::n8-01-engine::03-persistence",
+    "n8n::n8-02-api::03-openapi-postman",
+    "n8n::n8-03-workers::02-worker-ha"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

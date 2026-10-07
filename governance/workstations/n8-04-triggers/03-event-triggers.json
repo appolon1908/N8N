@@ -1,0 +1,25 @@
+{
+  "workstation": "n8n::n8-04-triggers::03-event-triggers",
+  "product": "n8n",
+  "section": "n8-04-triggers",
+  "subsection": "03-event-triggers",
+  "branch": "subsection/n8-04-triggers--03-event-triggers",
+  "parent_branch": "section/n8-04-triggers",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-04-triggers/subsections/03-event-triggers/repo",
+  "depends_on": [
+    "n8n::n8-02-api::03-openapi-postman",
+    "n8n::n8-03-workers::03-concurrency",
+    "n8n::n8-04-triggers::02-schedules"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

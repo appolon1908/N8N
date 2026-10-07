@@ -1,0 +1,23 @@
+{
+  "workstation": "n8n::n8-08-metering-quotas::01-usage-metering",
+  "product": "n8n",
+  "section": "n8-08-metering-quotas",
+  "subsection": "01-usage-metering",
+  "branch": "subsection/n8-08-metering-quotas--01-usage-metering",
+  "parent_branch": "section/n8-08-metering-quotas",
+  "order": 1,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-08-metering-quotas/subsections/01-usage-metering/repo",
+  "depends_on": [
+    "n8n::n8-07-tenancy-rbac::03-audit"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

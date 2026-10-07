@@ -1,0 +1,24 @@
+{
+  "workstation": "n8n::n8-04-triggers::01-webhook-triggers",
+  "product": "n8n",
+  "section": "n8-04-triggers",
+  "subsection": "01-webhook-triggers",
+  "branch": "subsection/n8-04-triggers--01-webhook-triggers",
+  "parent_branch": "section/n8-04-triggers",
+  "order": 1,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-04-triggers/subsections/01-webhook-triggers/repo",
+  "depends_on": [
+    "n8n::n8-02-api::03-openapi-postman",
+    "n8n::n8-03-workers::03-concurrency"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

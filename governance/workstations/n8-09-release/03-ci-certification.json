@@ -1,0 +1,24 @@
+{
+  "workstation": "n8n::n8-09-release::03-ci-certification",
+  "product": "n8n",
+  "section": "n8-09-release",
+  "subsection": "03-ci-certification",
+  "branch": "subsection/n8-09-release--03-ci-certification",
+  "parent_branch": "section/n8-09-release",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-09-release/subsections/03-ci-certification/repo",
+  "depends_on": [
+    "n8n::n8-08-metering-quotas::03-plan-enforcement",
+    "n8n::n8-09-release::02-performance-dr"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

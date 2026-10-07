@@ -1,0 +1,24 @@
+{
+  "workstation": "n8n::n8-08-metering-quotas::03-plan-enforcement",
+  "product": "n8n",
+  "section": "n8-08-metering-quotas",
+  "subsection": "03-plan-enforcement",
+  "branch": "subsection/n8-08-metering-quotas--03-plan-enforcement",
+  "parent_branch": "section/n8-08-metering-quotas",
+  "order": 3,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-08-metering-quotas/subsections/03-plan-enforcement/repo",
+  "depends_on": [
+    "n8n::n8-07-tenancy-rbac::03-audit",
+    "n8n::n8-08-metering-quotas::02-quotas"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

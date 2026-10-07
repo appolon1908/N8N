@@ -1,0 +1,25 @@
+{
+  "workstation": "n8n::n8-06-connectors::02-provider-contracts",
+  "product": "n8n",
+  "section": "n8-06-connectors",
+  "subsection": "02-provider-contracts",
+  "branch": "subsection/n8-06-connectors--02-provider-contracts",
+  "parent_branch": "section/n8-06-connectors",
+  "order": 2,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-06-connectors/subsections/02-provider-contracts/repo",
+  "depends_on": [
+    "n8n::n8-02-api::03-openapi-postman",
+    "n8n::n8-05-credentials::03-rotation",
+    "n8n::n8-06-connectors::01-registry"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}

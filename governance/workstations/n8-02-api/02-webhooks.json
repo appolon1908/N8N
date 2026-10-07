@@ -1,0 +1,24 @@
+{
+  "workstation": "n8n::n8-02-api::02-webhooks",
+  "product": "n8n",
+  "section": "n8-02-api",
+  "subsection": "02-webhooks",
+  "branch": "subsection/n8-02-api--02-webhooks",
+  "parent_branch": "section/n8-02-api",
+  "order": 2,
+  "worktree": "/srv/codestra/workstations/N8N/sections/n8-02-api/subsections/02-webhooks/repo",
+  "depends_on": [
+    "n8n::n8-01-engine::03-persistence",
+    "n8n::n8-02-api::01-public-api"
+  ],
+  "status": "NOT_STARTED",
+  "required_gates": [
+    "lint",
+    "unit",
+    "integration",
+    "contract",
+    "security",
+    "clean_tree",
+    "remote_sha_match"
+  ]
+}
