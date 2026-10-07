@@ -1,0 +1,139 @@
+{
+  "name": "cp.klyrow.email-dispatch.v1",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cp-klyrow-manual-trigger",
+      "name": "CP-KLYROW-MANUAL-TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-520, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "cp-klyrow-workflow-key", "name": "workflow_key", "value": "CP-KLYROW-EMAIL-DISPATCH", "type": "string"},
+            {"id": "cp-klyrow-command-version", "name": "command_version", "value": "1", "type": "number"},
+            {"id": "cp-klyrow-email-command", "name": "email_command_type", "value": "email.klyrow.send", "type": "string"},
+            {"id": "cp-klyrow-smtp-command", "name": "smtp_command_type", "value": "email.klyrow.smtp-relay", "type": "string"},
+            {"id": "cp-klyrow-event-command", "name": "event_command_type", "value": "email.klyrow.event", "type": "string"},
+            {"id": "cp-klyrow-dry-run", "name": "dry_run", "value": true, "type": "boolean"},
+            {"id": "cp-klyrow-tenant", "name": "tenant_id", "value": "={{$json.tenant_id || \"staging-tenant\"}}", "type": "string"},
+            {"id": "cp-klyrow-domain", "name": "domain", "value": "={{$json.domain || \"klyrow.com\"}}", "type": "string"},
+            {"id": "cp-klyrow-message", "name": "message_id", "value": "={{$json.message_id || $execution.id}}", "type": "string"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "cp-klyrow-shape-command",
+      "name": "Shape Middleware Email Commands",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-260, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/commands",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Idempotency-Key", "value": "={{$execution.id + \":email-send\"}}"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({job_id:$json.job_id || \"staging-klyrow-job\",lease_token:$json.lease_token || \"staging-lease\",execution_id:$execution.id,workflow_key:$json.workflow_key,workflow_version:\"1\",step_key:\"klyrow-email-send\",command_type:$json.email_command_type,dry_run:true,payload:{tenant_id:$json.tenant_id,domain:$json.domain,message_id:$json.message_id}})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-klyrow-request-email-command",
+      "name": "Request Email Send Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/commands",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Idempotency-Key", "value": "={{$execution.id + \":smtp-relay\"}}"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({job_id:$json.job_id || \"staging-klyrow-job\",lease_token:$json.lease_token || \"staging-lease\",execution_id:$execution.id,workflow_key:$json.workflow_key,workflow_version:\"1\",step_key:\"klyrow-smtp-relay\",command_type:$json.smtp_command_type,dry_run:true,payload:{tenant_id:$json.tenant_id,domain:$json.domain,message_id:$json.message_id}})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-klyrow-request-smtp-command",
+      "name": "Request SMTP Relay Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [260, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/commands",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Idempotency-Key", "value": "={{$execution.id + \":email-event\"}}"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({job_id:$json.job_id || \"staging-klyrow-job\",lease_token:$json.lease_token || \"staging-lease\",execution_id:$execution.id,workflow_key:$json.workflow_key,workflow_version:\"1\",step_key:\"klyrow-email-event\",command_type:$json.event_command_type,dry_run:true,payload:{tenant_id:$json.tenant_id,domain:$json.domain,message_id:$json.message_id,event_type:\"delivery.test\"}})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-klyrow-request-event-command",
+      "name": "Record Email Event Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "CP-KLYROW-MANUAL-TRIGGER": {
+      "main": [[{"node": "Shape Middleware Email Commands", "type": "main", "index": 0}]]
+    },
+    "Shape Middleware Email Commands": {
+      "main": [[{"node": "Request Email Send Through Middleware", "type": "main", "index": 0}]]
+    },
+    "Request Email Send Through Middleware": {
+      "main": [[{"node": "Request SMTP Relay Through Middleware", "type": "main", "index": 0}]]
+    },
+    "Request SMTP Relay Through Middleware": {
+      "main": [[{"node": "Record Email Event Through Middleware", "type": "main", "index": 0}]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "codestra": {
+      "workflow_group": "CP-KLYROW-*",
+      "workflow_key": "CP-KLYROW-EMAIL-DISPATCH",
+      "depends_on": ["CP-COMMON-ERROR-HANDLER"],
+      "contract_version": 2,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS",
+      "credentials_location": "N8N_CREDENTIAL_STORE_ONLY",
+      "direct_service_access": false,
+      "staging_delivery_flags": "OFF",
+      "email_authority": "KLYROW_THROUGH_MIDDLEWARE",
+      "smtp_authority": "KLYROW_SMTP_RELAY_THROUGH_MIDDLEWARE"
+    }
+  },
+  "tags": ["CP-KLYROW"]
+}

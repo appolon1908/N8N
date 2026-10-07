@@ -1,0 +1,67 @@
+{
+  "schema_version": "1.1",
+  "status": "UNVERIFIED",
+  "verified_at": null,
+  "verified_by": null,
+  "independent_reviewer": null,
+  "evidence_sha256": null,
+  "edition": "UNVERIFIED",
+  "endpoint_binding": {
+    "status": "UNVERIFIED",
+    "production_strategy": null,
+    "template_base_url": "https://middleware.invalid",
+    "approved_base_url": null,
+    "custom_variables_supported": null,
+    "egress_policy_evidence_sha256": null,
+    "allowed_strategies": [
+      "verified-custom-variable",
+      "verified-custom-node",
+      "verified-fixed-private-dns"
+    ]
+  },
+  "credential_binding": {
+    "status": "UNVERIFIED",
+    "strategy": null,
+    "approved_types": [],
+    "approved_names": [],
+    "evidence_sha256": null,
+    "allowed_strategies": [
+      "verified-n8n-credential",
+      "verified-custom-node-credential"
+    ]
+  },
+  "editor_access": {
+    "status": "UNVERIFIED",
+    "strategy": null,
+    "publicly_routable": false,
+    "evidence_sha256": null,
+    "session_policy_evidence_sha256": null,
+    "allowed_strategies": [
+      "verified-private-admin-network",
+      "verified-gateway-oidc-and-native-auth"
+    ]
+  },
+  "security": {
+    "environment_access_in_nodes": false,
+    "public_api_enabled": false,
+    "code_node_enabled": false,
+    "external_task_runners_required_if_code_enabled": true,
+    "dangerous_nodes_excluded": [
+      "n8n-nodes-base.code",
+      "n8n-nodes-base.executeCommand",
+      "n8n-nodes-base.ftp",
+      "n8n-nodes-base.git",
+      "n8n-nodes-base.localFileTrigger",
+      "n8n-nodes-base.readWriteFile",
+      "n8n-nodes-base.ssh",
+      "n8n-nodes-base.postgres",
+      "n8n-nodes-base.mysql",
+      "n8n-nodes-base.mariadb",
+      "n8n-nodes-base.redis",
+      "n8n-nodes-base.mongodb",
+      "n8n-nodes-base.odoo",
+      "n8n-nodes-base.twilio",
+      "n8n-nodes-base.emailSend"
+    ]
+  }
+}

@@ -1,0 +1,112 @@
+{
+  "schema_version": "2.2",
+  "status": "SOURCE_ONLY",
+  "default_activation": "DISABLED",
+  "external_effects_enabled": false,
+  "canonical_operation_policy": "contracts/operation-policy.v2.json",
+  "additional_catalogs": [
+    "automations/trading.catalog.v1.json",
+    "automations/beyvra.catalog.v2.json"
+  ],
+  "identity": {
+    "issuer": "https://auth.codestra.co/realms/codestra",
+    "grant_type": "client_credentials",
+    "maximum_access_token_lifetime_seconds": 300,
+    "audience": "middleware-api",
+    "full_scope_allowed": false,
+    "generic_execute_scope_allowed": false,
+    "generic_command_scope_allowed": false
+  },
+  "network_policy": {
+    "outbound_targets_from_n8n": ["codestra-middleware"],
+    "public_webhooks_in_n8n": false,
+    "direct_database_access": false,
+    "provider_credentials_in_n8n": false,
+    "prohibited_direct_targets": [
+      "keycloak-admin",
+      "kong-admin",
+      "odoo-19",
+      "vicidial",
+      "asterisk-pjsip",
+      "telnexa-gateway",
+      "jasmin",
+      "klyrow-gateway",
+      "klyrow-smtp",
+      "postal",
+      "mautic",
+      "social-codestra-api",
+      "postiz",
+      "social-provider-api",
+      "kyqra-gateway",
+      "crawlee-playwright",
+      "beyvra-backend",
+      "beyvra-frontend",
+      "broker-api",
+      "payment-provider",
+      "wallet-provider",
+      "provisioning-service",
+      "moneybee-api",
+      "breero-api",
+      "trading-api",
+      "postgresql",
+      "redis"
+    ]
+  },
+  "durable_handoff": {
+    "pattern": "middleware-outbox-wake-plus-atomic-claim",
+    "delivery": "at_least_once",
+    "deduplication": "event_id_plus_semantic_body_digest",
+    "lease_authority": "codestra-middleware",
+    "job_authority": "codestra-middleware-postgresql",
+    "timeout_semantics": "unknown_outcome_requires_destination_reconciliation",
+    "wake_claim_requires": [
+      "job_id",
+      "delivery_token",
+      "workflow_key",
+      "workflow_version",
+      "execution_id"
+    ]
+  },
+  "authoritative_context": {
+    "tenant": "middleware_automation_job",
+    "actor": "middleware_automation_job",
+    "workflow_family": "middleware_automation_job",
+    "caller_tenant_is_assertion_only": true,
+    "caller_actor_is_assertion_only": true
+  },
+  "repositories": [
+    {"id":"n8n","repo":"appolon1908-hue/N8N","branch":"contract/automation-control-plane-v2-20260827","role":"workflow-source-and-runtime-policy"},
+    {"id":"middleware","repo":"appolon1908-hue/Middleware-","branch":"integration/n8n-control-plane-v2-20260827","role":"cross-system-write-and-durable-job-authority"},
+    {"id":"odoo","repo":"appolon1908-hue/Odoo","branch":"integration/n8n-automation-contract-v2-20260827","role":"crm-business-system-of-record"},
+    {"id":"moneybee","repo":"appolon1908-hue/Moneybee-Backend","branch":"integration/n8n-automation-contract-v2-20260827","role":"moneybee-domain-authority"},
+    {"id":"keycloak","repo":"appolon1908-hue/Keycloak","branch":"integration/n8n-service-identities-v2-20260827","role":"machine-identity-authority"},
+    {"id":"scrapper","repo":"appolon1908-hue/scrapper","branch":"integration/n8n-crawler-automation-v2-20260827","role":"crawler-job-and-result-authority"},
+    {"id":"breero","repo":"appolon1908-hue/Breero.com","branch":"integration/n8n-marketplace-automation-v2-20260827","role":"marketplace-domain-authority"},
+    {"id":"trading","repo":"appolon1908-hue/trading-backend","branch":"integration/n8n-trading-automation-v2-20260827","role":"non-financial-trading-operations-authority"},
+    {"id":"klyrow","repo":"appolon1908-hue/klyrow.com","branch":"integration/codestra-email-fabric-v2","role":"email-and-smtp-domain-authority-through-middleware-only"},
+    {"id":"postly","repo":"appolon1908-hue/social.codestra.co","branch":"integration/n8n-postly-automation-v2-20260827","role":"social-domain-provider-connection-and-publication-authority"},
+    {"id":"beyvra-backend","repo":"appolon1908-hue/beyvra-backend","branch":"integration/n8n-automation-v2-20260827","role":"beyvra-platform-domain-and-automation-authority"},
+    {"id":"beyvra-frontend","repo":"appolon1908-hue/beyvra-frontend","branch":"integration/automation-status-ui-v2-20260827","role":"browser-ui-and-safe-status-projection","is_n8n_client":false}
+  ],
+  "dependency_pull_requests": {
+    "n8n_governance": 1,
+    "n8n_contract": 9,
+    "middleware_contract": 15,
+    "keycloak_contract": 10,
+    "klyrow_email_contract": "appolon1908-hue/klyrow.com#unassigned",
+    "postly_contract": "appolon1908-hue/social.codestra.co#1",
+    "beyvra_backend_contract": "appolon1908-hue/beyvra-backend#52",
+    "beyvra_frontend_contract": "appolon1908-hue/beyvra-frontend#24"
+  },
+  "release_rules": {
+    "feature_branch_deployment": false,
+    "workflows_active_in_git": false,
+    "credentials_in_git": false,
+    "exact_head_ci_required": true,
+    "independent_approval_required": true,
+    "immutable_release_from_protected_sha": true,
+    "staging_external_effects_zero": true,
+    "production_activation_separate": true,
+    "workflow_activation_enables_capability": false
+  }
+}

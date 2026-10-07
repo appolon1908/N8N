@@ -1,0 +1,133 @@
+name: codestra-n8n-staging-template
+
+x-n8n-common: &n8n-common
+  image: ${N8N_IMAGE:?N8N_IMAGE must be an immutable image reference by digest}
+  profiles:
+    - staging-after-runtime-verification
+  restart: "no"
+  user: "1000:1000"
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 256
+  stop_grace_period: 30s
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=64m
+  environment: &n8n-environment
+    DB_TYPE: postgresdb
+    DB_POSTGRESDB_HOST: ${POSTGRES_HOST:?POSTGRES_HOST is required}
+    DB_POSTGRESDB_PORT: ${POSTGRES_PORT:-5432}
+    DB_POSTGRESDB_DATABASE: ${POSTGRES_DATABASE:?POSTGRES_DATABASE is required}
+    DB_POSTGRESDB_USER: ${POSTGRES_USER:?POSTGRES_USER is required}
+    DB_POSTGRESDB_PASSWORD_FILE: /run/secrets/postgres_password
+    EXECUTIONS_MODE: queue
+    OFFLOAD_MANUAL_EXECUTIONS_TO_WORKERS: "true"
+    N8N_DEFAULT_BINARY_DATA_MODE: database
+    QUEUE_BULL_REDIS_HOST: ${REDIS_HOST:?REDIS_HOST is required}
+    QUEUE_BULL_REDIS_PORT: ${REDIS_PORT:-6379}
+    QUEUE_BULL_REDIS_PASSWORD_FILE: /run/secrets/redis_password
+    N8N_ENCRYPTION_KEY_FILE: /run/secrets/n8n_encryption_key
+    N8N_HOST: ${N8N_PUBLIC_HOST:?N8N_PUBLIC_HOST is required}
+    N8N_PORT: "5678"
+    N8N_PROTOCOL: https
+    WEBHOOK_URL: ${N8N_WEBHOOK_URL:?N8N_WEBHOOK_URL is required}
+    N8N_EDITOR_BASE_URL: ${N8N_EDITOR_BASE_URL:?N8N_EDITOR_BASE_URL is required}
+    N8N_PROXY_HOPS: "1"
+    N8N_SECURE_COOKIE: "true"
+    N8N_ENFORCE_SETTINGS_FILE_PERMISSIONS: "true"
+    N8N_BLOCK_ENV_ACCESS_IN_NODE: "true"
+    N8N_BLOCK_FILE_ACCESS_TO_N8N_FILES: "true"
+    N8N_RESTRICT_FILE_ACCESS_TO: /tmp/n8n-files
+    N8N_GIT_NODE_DISABLE_BARE_REPOS: "true"
+    N8N_GIT_NODE_ENABLE_HOOKS: "false"
+    N8N_PUBLIC_API_DISABLED: "true"
+    N8N_PUBLIC_API_SWAGGERUI_DISABLED: "true"
+    N8N_HIRING_BANNER_ENABLED: "false"
+    N8N_DIAGNOSTICS_ENABLED: "false"
+    N8N_PERSONALIZATION_ENABLED: "false"
+    N8N_VERSION_NOTIFICATIONS_ENABLED: "false"
+    N8N_TEMPLATES_ENABLED: "false"
+    N8N_COMMUNITY_PACKAGES_ENABLED: "false"
+    NODE_FUNCTION_ALLOW_BUILTIN: ""
+    NODE_FUNCTION_ALLOW_EXTERNAL: ""
+    NODES_EXCLUDE: '["n8n-nodes-base.code","n8n-nodes-base.executeCommand","n8n-nodes-base.ftp","n8n-nodes-base.git","n8n-nodes-base.localFileTrigger","n8n-nodes-base.readWriteFile","n8n-nodes-base.ssh","n8n-nodes-base.postgres","n8n-nodes-base.mysql","n8n-nodes-base.mariadb","n8n-nodes-base.redis","n8n-nodes-base.mongodb","n8n-nodes-base.odoo","n8n-nodes-base.twilio","n8n-nodes-base.emailSend"]'
+    EXECUTIONS_DATA_SAVE_ON_SUCCESS: none
+    EXECUTIONS_DATA_SAVE_ON_ERROR: all
+    EXECUTIONS_DATA_PRUNE: "true"
+    EXECUTIONS_DATA_MAX_AGE: "168"
+    N8N_METRICS: "true"
+    N8N_METRICS_INCLUDE_QUEUE_METRICS: "true"
+    N8N_GRACEFUL_SHUTDOWN_TIMEOUT: "30"
+    N8N_LOG_LEVEL: info
+  secrets:
+    - n8n_encryption_key
+    - postgres_password
+    - redis_password
+  volumes:
+    - n8n_data:/home/node/.n8n
+  networks:
+    - middleware_network
+  logging:
+    driver: json-file
+    options:
+      max-size: 10m
+      max-file: "3"
+
+services:
+  n8n-main:
+    <<: *n8n-common
+    expose:
+      - "5678"
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5678/healthz/readiness').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  n8n-worker:
+    <<: *n8n-common
+    environment:
+      <<: *n8n-environment
+      QUEUE_HEALTH_CHECK_ACTIVE: "true"
+      QUEUE_HEALTH_CHECK_PORT: "5680"
+    command:
+      - worker
+      - --concurrency=${N8N_WORKER_CONCURRENCY:-5}
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:5680/healthz/readiness').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  n8n_data:
+    external: true
+    name: ${N8N_DATA_VOLUME:?N8N_DATA_VOLUME must be verified before use}
+
+networks:
+  middleware_network:
+    external: true
+    name: ${MIDDLEWARE_NETWORK:?MIDDLEWARE_NETWORK must be verified before use}
+
+secrets:
+  n8n_encryption_key:
+    external: true
+    name: ${N8N_ENCRYPTION_SECRET_NAME:?N8N encryption secret must be provisioned outside Git}
+  postgres_password:
+    external: true
+    name: ${POSTGRES_PASSWORD_SECRET_NAME:?PostgreSQL secret must be provisioned outside Git}
+  redis_password:
+    external: true
+    name: ${REDIS_PASSWORD_SECRET_NAME:?Redis secret must be provisioned outside Git}

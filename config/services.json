@@ -1,0 +1,189 @@
+{
+  "schema_version": "1.0",
+  "services": [
+    {
+      "id": "codestra-middleware",
+      "category": "control-plane",
+      "access_from_n8n": "ALLOW_MIDDLEWARE_API",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "runtime-secret-provider",
+      "direct_database_access": false
+    },
+    {
+      "id": "caddy",
+      "category": "edge",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "operations",
+      "direct_database_access": false
+    },
+    {
+      "id": "kong",
+      "category": "gateway",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "gateway-control-plane",
+      "direct_database_access": false
+    },
+    {
+      "id": "keycloak",
+      "category": "identity",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "identity-control-plane",
+      "direct_database_access": false
+    },
+    {
+      "id": "odoo-19",
+      "category": "crm",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "vicidial",
+      "category": "telephony",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "jasmin",
+      "category": "sms",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "postal-klyrow",
+      "category": "email",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "klyrow-smtp",
+      "category": "smtp",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "kyqra",
+      "category": "crawler",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "postgresql",
+      "category": "data",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "runtime-secret-provider",
+      "direct_database_access": false
+    },
+    {
+      "id": "redis",
+      "category": "queue",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "runtime-secret-provider",
+      "direct_database_access": false
+    },
+    {
+      "id": "postly-social",
+      "category": "social",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "moneybee",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "beyvra",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "larim-a",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "freight-platform",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "breero",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "booked4seasons",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "trading-platform",
+      "category": "product",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-adapter",
+      "direct_database_access": false
+    },
+    {
+      "id": "codestra-provisioning",
+      "category": "provisioning",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "middleware-control-plane",
+      "direct_database_access": false
+    },
+    {
+      "id": "nats",
+      "category": "event-bus",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "platform-control-plane",
+      "direct_database_access": false
+    },
+    {
+      "id": "temporal",
+      "category": "workflow-engine",
+      "access_from_n8n": "DENY_DIRECT",
+      "runtime_status": "UNVERIFIED",
+      "credential_owner": "platform-control-plane",
+      "direct_database_access": false
+    }
+  ]
+}

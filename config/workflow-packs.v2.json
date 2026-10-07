@@ -1,0 +1,148 @@
+{
+  "schema_version": "2.0",
+  "packs": [
+    {
+      "id": "shared.runtime.v2",
+      "cell": "all",
+      "branch": "shared/automation-runtime-v2-20260827",
+      "capabilities": []
+    },
+    {
+      "id": "identity.service-identities.v2",
+      "cell": "n8n-core",
+      "branch": "automation/identity-keycloak-v2-20260827",
+      "capabilities": [
+        "PROVISIONING_WRITE"
+      ]
+    },
+    {
+      "id": "provisioning.lifecycle.v2",
+      "cell": "n8n-core",
+      "branch": "automation/provisioning-v2-20260827",
+      "capabilities": [
+        "PROVISIONING_WRITE"
+      ]
+    },
+    {
+      "id": "odoo.crm.v2",
+      "cell": "n8n-core",
+      "branch": "automation/odoo-crm-v2-20260827",
+      "capabilities": [
+        "ODOO_WRITE",
+        "CALLBACK_DISPATCH"
+      ]
+    },
+    {
+      "id": "telephony.v2",
+      "cell": "n8n-contact-center",
+      "branch": "automation/vicidial-telephony-v2-20260827",
+      "capabilities": [
+        "PRODUCTION_DIALING",
+        "CALLBACK_DISPATCH"
+      ]
+    },
+    {
+      "id": "klyrow.email.v2",
+      "cell": "n8n-core",
+      "branch": "automation/klyrow-email-v2-20260827",
+      "capabilities": [
+        "EMAIL_DELIVERY"
+      ]
+    },
+    {
+      "id": "telnexa.sms.v2",
+      "cell": "n8n-core",
+      "branch": "automation/telnexa-sms-v2-20260827",
+      "capabilities": [
+        "SMS_DELIVERY"
+      ]
+    },
+    {
+      "id": "postly.social.v2",
+      "cell": "n8n-core",
+      "branch": "automation/postly-social-v2-20260827",
+      "capabilities": [
+        "SOCIAL_PUBLISH"
+      ]
+    },
+    {
+      "id": "kyqra.crawler.v2",
+      "cell": "n8n-core",
+      "branch": "automation/kyqra-crawler-v2-20260827",
+      "capabilities": [
+        "CRAWLER_EXECUTION",
+        "CRAWLER_WRITEBACK"
+      ]
+    },
+    {
+      "id": "beyvra.platform.v2",
+      "cell": "n8n-beyvra",
+      "branch": "automation/beyvra-operations-v2-20260827",
+      "capabilities": [
+        "BEYVRA_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "moneybee.loans.v2",
+      "cell": "n8n-moneybee",
+      "branch": "automation/moneybee-loans-v2-20260827",
+      "capabilities": [
+        "MONEYBEE_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "breero.marketplace.v2",
+      "cell": "n8n-breero",
+      "branch": "automation/breero-marketplace-v2-20260827",
+      "capabilities": [
+        "BREERO_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "larim-a.booking.v2",
+      "cell": "n8n-larim-a",
+      "branch": "automation/larim-a-booking-v2-20260827",
+      "capabilities": [
+        "LARIM_A_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "freight.operations.v2",
+      "cell": "n8n-freight",
+      "branch": "automation/freight-operations-v2-20260827",
+      "capabilities": [
+        "FREIGHT_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "booked4seasons.booking.v2",
+      "cell": "n8n-booked4seasons",
+      "branch": "automation/booked4seasons-v2-20260827",
+      "capabilities": [
+        "BOOKED4SEASONS_OPERATIONS_WRITE"
+      ]
+    },
+    {
+      "id": "trading.operations.v2",
+      "cell": "n8n-trading",
+      "branch": "automation/trading-operations-v2-20260827",
+      "capabilities": [
+        "TRADING_OPERATIONS_READONLY"
+      ]
+    },
+    {
+      "id": "privacy.v2",
+      "cell": "n8n-core",
+      "branch": "privacy/data-rights-v2-20260827",
+      "capabilities": [
+        "PRIVACY_WRITE"
+      ]
+    }
+  ],
+  "activation_defaults": {
+    "imported": false,
+    "published": false,
+    "active": false,
+    "capabilities_enabled": false
+  }
+}

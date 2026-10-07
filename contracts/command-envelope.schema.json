@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.codestra.co/automation/command-envelope.v1.json",
+  "title": "Codestra automation command envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "event_id",
+    "tenant_id",
+    "correlation_id",
+    "idempotency_key",
+    "type",
+    "version",
+    "occurred_at",
+    "actor",
+    "payload"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "tenant_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "correlation_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "idempotency_key": {
+      "type": "string",
+      "minLength": 8,
+      "maxLength": 128
+    },
+    "type": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$",
+      "maxLength": 160
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "subject",
+        "kind"
+      ],
+      "properties": {
+        "subject": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "kind": {
+          "enum": [
+            "human",
+            "service",
+            "system"
+          ]
+        }
+      }
+    },
+    "payload": {
+      "type": "object"
+    },
+    "trace": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trace_id": {
+          "type": "string",
+          "maxLength": 128
+        },
+        "parent_span_id": {
+          "type": "string",
+          "maxLength": 128
+        }
+      }
+    }
+  }
+}

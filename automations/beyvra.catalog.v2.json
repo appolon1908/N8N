@@ -1,0 +1,213 @@
+{
+  "schema_version": "2.0",
+  "status": "SOURCE_ONLY",
+  "default_activation": "DISABLED",
+  "product": "beyvra",
+  "backend_repository": "appolon1908-hue/beyvra-backend",
+  "backend_branch": "integration/n8n-automation-v2-20260827",
+  "backend_pull_request": 52,
+  "frontend_repository": "appolon1908-hue/beyvra-frontend",
+  "frontend_branch": "integration/automation-status-ui-v2-20260827",
+  "frontend_pull_request": 24,
+  "workflow_family": "product.beyvra-platform",
+  "machine_client": "n8n-product-automation",
+  "required_scopes": [
+    "automation.job.claim",
+    "automation.job.read",
+    "automation.job.heartbeat",
+    "automation.job.step.write",
+    "automation.job.complete",
+    "automation.job.fail",
+    "automation.command.read",
+    "automation.command.product",
+    "automation.approval.request",
+    "automation.approval.read",
+    "automation.capability.read"
+  ],
+  "allowed_command_prefixes": [
+    "beyvra.operations."
+  ],
+  "lane_description": "Beyvra platform automation; separate from the Trading platform lane.",
+  "frontend_is_machine_client": false,
+  "workflows": [
+    {
+      "id": "beyvra.account.onboarding-assistance.v1",
+      "trigger": "beyvra.account.onboarding_started",
+      "middleware_route": "/v2/automation/beyvra/onboarding-assistance",
+      "command_types": [
+        "beyvra.operations.onboarding-task.create.v1",
+        "beyvra.operations.notification.request.v1"
+      ],
+      "required_capabilities": [
+        "BEYVRA_OPERATIONS_WRITE"
+      ],
+      "approval": "POLICY",
+      "external_effect": true,
+      "replay_classification": "IDEMPOTENT_STATE_PROJECTION",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    },
+    {
+      "id": "beyvra.compliance.missing-document-reminder.v1",
+      "trigger": "beyvra.compliance.document_missing",
+      "middleware_route": "/v2/automation/beyvra/compliance-reminder",
+      "command_types": [
+        "beyvra.operations.compliance-reminder.request.v1"
+      ],
+      "required_capabilities": [
+        "BEYVRA_NOTIFICATION_REQUEST",
+        "ENABLE_EXTERNAL_DELIVERY"
+      ],
+      "approval": "COMPLIANCE_POLICY",
+      "external_effect": true,
+      "replay_classification": "CANCEL_IF_NOT_SUBMITTED",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    },
+    {
+      "id": "beyvra.support.case-escalation.v1",
+      "trigger": "beyvra.support.case_created",
+      "middleware_route": "/v2/automation/beyvra/support-escalation",
+      "command_types": [
+        "beyvra.operations.support-escalation.create.v1",
+        "beyvra.operations.internal-alert.request.v1"
+      ],
+      "required_capabilities": [
+        "BEYVRA_OPERATIONS_WRITE"
+      ],
+      "approval": "SUPPORT_POLICY",
+      "external_effect": true,
+      "replay_classification": "IDEMPOTENT_STATE_PROJECTION",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    },
+    {
+      "id": "beyvra.report.generation-request.v1",
+      "trigger": "beyvra.report.requested",
+      "middleware_route": "/v2/automation/beyvra/report-generation",
+      "command_types": [
+        "beyvra.operations.report-generation.request.v1",
+        "beyvra.operations.report-status.read.v1"
+      ],
+      "required_capabilities": [
+        "BEYVRA_REPORT_REQUEST"
+      ],
+      "approval": "REPORT_POLICY",
+      "external_effect": true,
+      "replay_classification": "CANCEL_IF_NOT_SUBMITTED",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    },
+    {
+      "id": "beyvra.webhook.delivery-exception.v1",
+      "trigger": "beyvra.webhook.delivery_failed",
+      "middleware_route": "/v2/automation/beyvra/webhook-delivery-exception",
+      "command_types": [
+        "beyvra.operations.webhook-delivery.read.v1",
+        "beyvra.operations.webhook-retry.request.v1"
+      ],
+      "required_capabilities": [
+        "BEYVRA_OPERATIONS_WRITE"
+      ],
+      "approval": "OPERATOR_FOR_RETRY",
+      "external_effect": true,
+      "replay_classification": "PROTECTED_RETRY_REQUEST",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    },
+    {
+      "id": "beyvra.notification.delivery-reconcile.v1",
+      "trigger": "beyvra.notification.delivery_failed",
+      "middleware_route": "/v2/automation/beyvra/notification-reconcile",
+      "command_types": [
+        "beyvra.operations.internal-alert.request.v1"
+      ],
+      "required_capabilities": [
+        "INTERNAL_ALERTS"
+      ],
+      "approval": "NONE",
+      "external_effect": true,
+      "replay_classification": "IDEMPOTENT_STATE_PROJECTION",
+      "state": "DESIGN_ONLY",
+      "active": false,
+      "direct_service_access": false
+    }
+  ],
+  "prohibited_command_prefixes": [
+    "trade.",
+    "order.",
+    "wallet.",
+    "ledger.",
+    "hold.",
+    "payment.",
+    "withdrawal.",
+    "deposit.",
+    "transfer.",
+    "custody.",
+    "chain.",
+    "broker.",
+    "provider."
+  ],
+  "prohibited_effects": [
+    "trade.place",
+    "trade.modify",
+    "trade.cancel_live",
+    "trade.close",
+    "order.submit",
+    "order.execute",
+    "wallet.create",
+    "wallet.balance.mutate",
+    "wallet.deposit",
+    "wallet.withdraw",
+    "wallet.transfer",
+    "ledger.post",
+    "hold.reserve",
+    "hold.capture",
+    "hold.release",
+    "payment.charge",
+    "payment.refund",
+    "withdrawal.create",
+    "withdrawal.approve",
+    "withdrawal.reject",
+    "withdrawal.execute",
+    "deposit.credit",
+    "transfer.execute",
+    "custody.sign",
+    "chain.broadcast",
+    "demo.order.submit"
+  ],
+  "capabilities": {
+    "BEYVRA_OPERATIONS_WRITE": false,
+    "BEYVRA_NOTIFICATION_REQUEST": false,
+    "BEYVRA_REPORT_REQUEST": false,
+    "ODOO_WRITE": false,
+    "ENABLE_EXTERNAL_DELIVERY": false,
+    "DEAD_LETTER_REPLAY": false,
+    "REAL_TRADING_EXECUTION": false,
+    "REAL_WALLET_DEPOSITS": false,
+    "REAL_WALLET_WITHDRAWALS": false,
+    "REAL_WALLET_TRANSFERS": false,
+    "PAYMENT_EXECUTION": false,
+    "CUSTODY_EXECUTION": false,
+    "CHAIN_BROADCAST": false
+  },
+  "invariants": {
+    "direct_n8n_backend_access": false,
+    "direct_n8n_frontend_access": false,
+    "frontend_machine_client": false,
+    "financial_effects_allowed": false,
+    "demo_order_effects_allowed": false,
+    "caller_tenant_authoritative": false,
+    "active_lease_required_for_command": true,
+    "unknown_outcome_reconciled_before_retry": true,
+    "exact_replay_returns_original_result": true,
+    "conflicting_replay_rejected": true,
+    "workflow_activation_enables_capability": false,
+    "live_apply_authorized": false
+  }
+}

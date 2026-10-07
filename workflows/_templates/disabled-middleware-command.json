@@ -1,0 +1,128 @@
+{
+  "name": "template.middleware-command.v1",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "09b7959e-a437-4f69-a95f-505d6fbc3b17",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9bbcbefb-f230-4f46-87b9-6fa3fc998937",
+              "name": "event_id",
+              "value": "={{$execution.id}}",
+              "type": "string"
+            },
+            {
+              "id": "b27ea6e4-67de-43b5-aab2-97c986eec3f1",
+              "name": "correlation_id",
+              "value": "={{$execution.id}}",
+              "type": "string"
+            },
+            {
+              "id": "108a8a93-525b-4d33-82f9-5c7b66440cd5",
+              "name": "idempotency_key",
+              "value": "={{$workflow.id + ':' + $execution.id}}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "c4b03065-b8ef-4d0a-a4e5-42e21ec27bdd",
+      "name": "Prepare Command Envelope",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -280,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/commands",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Idempotency-Key",
+              "value": "={{$json.idempotency_key}}"
+            },
+            {
+              "name": "X-Correlation-Id",
+              "value": "={{$json.correlation_id}}"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify($json)}}",
+        "options": {
+          "timeout": 10000
+        }
+      },
+      "id": "c01a06d0-c682-4406-b1ba-879941032739",
+      "name": "Request Middleware Command",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -20,
+        0
+      ],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Prepare Command Envelope",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Command Envelope": {
+      "main": [
+        [
+          {
+            "node": "Request Middleware Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": false
+  },
+  "versionId": "19bdf594-1c84-4b0c-b80f-377fe0597180",
+  "meta": {
+    "codestra": {
+      "template": true,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS"
+    }
+  },
+  "tags": []
+}

@@ -1,0 +1,13 @@
+{
+  "name": "shared.reconciliation-sweeper.v2",
+  "nodes": [
+    {"parameters":{},"id":"b4a2ec10-297f-4c9c-865f-01541890589d","name":"Manual Trigger","type":"n8n-nodes-base.manualTrigger","typeVersion":1,"position":[-500,0]},
+    {"parameters":{"assignments":{"assignments":[{"id":"47d3b426-adca-46e7-9c5b-c4e409884d68","name":"requested_by","value":"shared.reconciliation-sweeper.v2","type":"string"},{"id":"08a307f1-6dce-4f8f-b420-fc0a75ebd785","name":"dry_run","value":true,"type":"boolean"}]},"options":{}},"id":"9c1c176c-f785-4a36-baf1-3988c83a58dc","name":"Prepare Reconciliation","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[-260,0]},
+    {"parameters":{"method":"POST","url":"https://middleware.invalid/v2/automation/jobs/reconcile","sendBody":true,"contentType":"raw","rawContentType":"application/json","body":"={{JSON.stringify($json)}}","options":{"timeout":10000}},"id":"56c4d990-9318-43f1-8f1c-c1649f2c82e6","name":"Request Reconciliation","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[20,0],"disabled":true}
+  ],
+  "connections":{"Manual Trigger":{"main":[[{"node":"Prepare Reconciliation","type":"main","index":0}]]},"Prepare Reconciliation":{"main":[[{"node":"Request Reconciliation","type":"main","index":0}]]}},
+  "pinData":{},"active":false,
+  "settings":{"executionOrder":"v1","saveDataSuccessExecution":"none","saveManualExecutions":false},
+  "versionId":"1c699262-806d-42f1-a7c2-b5ca41dc6f0f",
+  "meta":{"codestra":{"shared_runtime":true,"contract_version":2,"activation_state":"DISABLED","network_policy":"MIDDLEWARE_ONLY","endpoint_binding":"UNVERIFIED_TEMPLATE_ONLY","credential_binding":"NO_CREDENTIALS","effects":"NO_EFFECT_RECONCILIATION_PLAN"}},"tags":[]
+}

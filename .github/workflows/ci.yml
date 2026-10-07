@@ -1,0 +1,66 @@
+name: source-validation
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - "platform/**"
+      - "contract/**"
+      - "shared/**"
+      - "automation/**"
+      - "operations/**"
+      - "privacy/**"
+      - "observability/**"
+      - "testing/**"
+      - "infra/**"
+      - "release/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: source-validation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-exact-head:
+    name: Validate exact repository SHA
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out exact source head
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Prove exact checkout identity
+        env:
+          EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -Eeuo pipefail
+          actual_sha="$(git rev-parse HEAD)"
+          test "$actual_sha" = "$EXPECTED_SHA"
+          printf 'EXACT_HEAD_SHA=%s\n' "$actual_sha"
+
+      - name: Compile validation tooling and policy tests
+        run: |
+          set -Eeuo pipefail
+          python3 -m compileall -q scripts operations tests
+
+      - name: Run repository safety gates
+        run: |
+          set -Eeuo pipefail
+          make validate
+
+      - name: Enforce Stage 4 architecture and read-only drift tooling
+        run: |
+          set -Eeuo pipefail
+          python3 scripts/validate_stage4_architecture.py workflows
+          python3 -m unittest tests.test_stage4_architecture
+          git diff --check

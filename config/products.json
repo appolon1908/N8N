@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0",
+  "products": [
+    {
+      "id": "codestra-core",
+      "display_name": "Codestra Core",
+      "namespace": "codestra",
+      "domains": [
+        "crm",
+        "operations",
+        "privacy",
+        "delivery"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "telnexa",
+      "display_name": "Telnexa",
+      "namespace": "telnexa",
+      "domains": [
+        "voice",
+        "sms",
+        "billing"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "klyrow",
+      "display_name": "Klyrow",
+      "namespace": "klyrow",
+      "domains": [
+        "email",
+        "campaigns",
+        "delivery"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "kyqra",
+      "display_name": "Kyqra",
+      "namespace": "kyqra",
+      "domains": [
+        "crawler",
+        "business-discovery",
+        "enrichment"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "moneybee",
+      "display_name": "MoneyBee",
+      "namespace": "moneybee",
+      "domains": [
+        "application",
+        "documents",
+        "lender-routing"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "breero",
+      "display_name": "Breero",
+      "namespace": "breero",
+      "domains": [
+        "marketplace",
+        "provider-routing",
+        "jobs"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "larim-a",
+      "display_name": "LARIM-A",
+      "namespace": "larim-a",
+      "domains": [
+        "booking",
+        "dispatch",
+        "appointments"
+      ],
+      "status": "DESIGN_ONLY"
+    },
+    {
+      "id": "freight-platform",
+      "display_name": "Freight Platform",
+      "namespace": "freight",
+      "domains": [
+        "quotes",
+        "loads",
+        "tracking",
+        "exceptions"
+      ],
+      "status": "DESIGN_ONLY"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "schema_version": "2.0",
+  "status": "SOURCE_ONLY",
+  "default_activation": "DISABLED",
+  "financial_effects_allowed": false,
+  "authorization": {
+    "workflow_family": "product.trading-nonfinancial",
+    "machine_client": "n8n-product-automation",
+    "required_scopes": [
+      "automation.job.claim",
+      "automation.job.read",
+      "automation.job.heartbeat",
+      "automation.job.step.write",
+      "automation.job.complete",
+      "automation.job.fail",
+      "automation.command.read",
+      "automation.command.product",
+      "automation.approval.request",
+      "automation.approval.read",
+      "automation.capability.read"
+    ],
+    "allowed_command_prefixes": [
+      "trading.operations.",
+      "real-wallet.operations."
+    ]
+  },
+  "workflows": [
+    {"id":"trading.customer.onboarding-review.v1","middleware_route":"/v2/automation/trading/onboarding-review","required_capabilities":[],"effect":"OPERATIONS_TASK_ONLY","approval":"HUMAN","replay_classification":"IDEMPOTENT_STATE_PROJECTION","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"trading.compliance.exception-route.v1","middleware_route":"/v2/automation/trading/compliance-exception","required_capabilities":[],"effect":"OPERATIONS_TASK_ONLY","approval":"COMPLIANCE","replay_classification":"IDEMPOTENT_STATE_PROJECTION","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"trading.risk.alert-escalate.v1","middleware_route":"/v2/automation/trading/risk-alert","required_capabilities":["INTERNAL_ALERTS"],"effect":"INTERNAL_NOTIFICATION_ONLY","approval":"NONE","replay_classification":"IDEMPOTENT_STATE_PROJECTION","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"trading.margin.alert-escalate.v1","middleware_route":"/v2/automation/trading/margin-alert","required_capabilities":["INTERNAL_ALERTS"],"effect":"INTERNAL_NOTIFICATION_ONLY","approval":"NONE","replay_classification":"IDEMPOTENT_STATE_PROJECTION","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"trading.order-status-notification.v1","middleware_route":"/v2/automation/trading/order-status-notification","required_capabilities":["ENABLE_EXTERNAL_DELIVERY"],"effect":"GATED_MESSAGE_REQUEST","approval":"POLICY","replay_classification":"CANCEL_IF_NOT_SUBMITTED","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"real-wallet.withdrawal-approval-reminder.v1","middleware_route":"/v2/automation/real-wallet/withdrawal-reminder","required_capabilities":["INTERNAL_ALERTS"],"effect":"REMINDER_ONLY","approval":"NONE","replay_classification":"IDEMPOTENT_STATE_PROJECTION","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"real-wallet.reconciliation-exception.v1","middleware_route":"/v2/automation/real-wallet/reconciliation-exception","required_capabilities":[],"effect":"OPERATIONS_TASK_ONLY","approval":"HUMAN","replay_classification":"RECONCILE_ONLY","state":"DESIGN_ONLY","active":false,"direct_service_access":false},
+    {"id":"real-wallet.webhook-delivery-exception.v1","middleware_route":"/v2/automation/real-wallet/webhook-delivery-exception","required_capabilities":[],"effect":"RETRY_REVIEW_ONLY","approval":"HUMAN","replay_classification":"NO_AUTOMATIC_REPLAY","state":"DESIGN_ONLY","active":false,"direct_service_access":false}
+  ],
+  "prohibited_effects": [
+    "trade.place",
+    "trade.cancel_live",
+    "wallet.balance.mutate",
+    "ledger.post",
+    "hold.reserve",
+    "hold.capture",
+    "hold.release",
+    "withdrawal.create",
+    "withdrawal.approve",
+    "withdrawal.reject",
+    "withdrawal.execute",
+    "transfer.execute",
+    "deposit.credit",
+    "custody.sign",
+    "chain.broadcast"
+  ],
+  "capabilities": {
+    "REAL_TRADING_EXECUTION": false,
+    "REAL_WALLET_READ": false,
+    "REAL_WALLET_DEPOSITS": false,
+    "REAL_WALLET_WITHDRAWALS": false,
+    "REAL_WALLET_TRANSFERS": false,
+    "CUSTODY_EXECUTION": false,
+    "CHAIN_BROADCAST": false,
+    "PAYMENT_EXECUTION": false,
+    "DEAD_LETTER_REPLAY": false
+  }
+}

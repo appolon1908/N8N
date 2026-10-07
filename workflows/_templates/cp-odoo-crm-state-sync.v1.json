@@ -1,0 +1,185 @@
+{
+  "name": "cp.odoo.crm-state-sync.v1",
+  "active": false,
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cp-odoo-manual-trigger",
+      "name": "CP-ODOO-MANUAL-TRIGGER",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [-760, 0]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {"id": "cp-odoo-job-id", "name": "job_id", "value": "={{$json.job_id || \"staging-cp-odoo-job\"}}", "type": "string"},
+            {"id": "cp-odoo-delivery-token", "name": "delivery_token", "value": "={{$json.delivery_token || \"staging-delivery-token\"}}", "type": "string"},
+            {"id": "cp-odoo-workflow-key", "name": "workflow_key", "value": "CP-ODOO-CRM-STATE-SYNC", "type": "string"},
+            {"id": "cp-odoo-workflow-version", "name": "workflow_version", "value": "1", "type": "string"},
+            {"id": "cp-odoo-execution-id", "name": "execution_id", "value": "={{$execution.id}}", "type": "string"},
+            {"id": "cp-odoo-command-type", "name": "command_type", "value": "crm.odoo.state-sync", "type": "string"},
+            {"id": "cp-odoo-step-key", "name": "step_key", "value": "odoo-state-sync", "type": "string"},
+            {"id": "cp-odoo-dry-run", "name": "dry_run", "value": true, "type": "boolean"},
+            {"id": "cp-odoo-payload", "name": "payload", "value": "={{$json.payload || {\"lead_id\":\"staging-lead\",\"target_state\":\"qualified\"}}}", "type": "object"}
+          ]
+        },
+        "options": {}
+      },
+      "id": "cp-odoo-shape-claim",
+      "name": "Shape Claim And Command",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-520, 0]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/claim",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({job_id:$json.job_id,delivery_token:$json.delivery_token,workflow_key:$json.workflow_key,workflow_version:$json.workflow_version,execution_id:$json.execution_id})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-claim-job",
+      "name": "Claim Middleware Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [-260, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/{{$json.job_id}}/heartbeat",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({lease_token:$json.lease_token,execution_id:$json.execution_id})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-heartbeat-job",
+      "name": "Heartbeat Middleware Lease",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [0, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/{{$json.job_id}}/steps",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({lease_token:$json.lease_token,execution_id:$json.execution_id,step_key:\"odoo-state-sync\",status:\"STARTED\"})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-record-step",
+      "name": "Record Odoo Step Started",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [260, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/commands",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {"name": "Idempotency-Key", "value": "={{$json.job_id + \":\" + $json.execution_id + \":odoo-state-sync\"}}"}
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({job_id:$json.job_id,lease_token:$json.lease_token,execution_id:$json.execution_id,workflow_key:\"CP-ODOO-CRM-STATE-SYNC\",workflow_version:\"1\",step_key:\"odoo-state-sync\",command_type:\"crm.odoo.state-sync\",dry_run:true,payload:$json.payload})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-request-command",
+      "name": "Request Odoo State Change Through Middleware",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [520, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://middleware.invalid/v2/automation/commands/{{$json.command_id}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-read-command",
+      "name": "Read Middleware Command Result",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [780, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/{{$json.job_id}}/complete",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({lease_token:$json.lease_token,execution_id:$json.execution_id,result:{odoo_state:\"DRY_RUN_VERIFIED\",command_id:$json.command_id}})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-complete-job",
+      "name": "Complete Middleware Job",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 0],
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://middleware.invalid/v2/automation/jobs/{{$json.job_id}}/fail",
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={{JSON.stringify({lease_token:$json.lease_token,execution_id:$json.execution_id,error:{code:\"CP_ODOO_FAILED\",message:$json.error?.message || \"workflow failed\"},safe_replay:false})}}",
+        "options": {"timeout": 10000}
+      },
+      "id": "cp-odoo-fail-job",
+      "name": "Route Failure To Middleware DLQ",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1040, 220],
+      "disabled": true
+    }
+  ],
+  "connections": {
+    "CP-ODOO-MANUAL-TRIGGER": {"main": [[{"node": "Shape Claim And Command", "type": "main", "index": 0}]]},
+    "Shape Claim And Command": {"main": [[{"node": "Claim Middleware Job", "type": "main", "index": 0}]]},
+    "Claim Middleware Job": {"main": [[{"node": "Heartbeat Middleware Lease", "type": "main", "index": 0}]]},
+    "Heartbeat Middleware Lease": {"main": [[{"node": "Record Odoo Step Started", "type": "main", "index": 0}]]},
+    "Record Odoo Step Started": {"main": [[{"node": "Request Odoo State Change Through Middleware", "type": "main", "index": 0}]]},
+    "Request Odoo State Change Through Middleware": {"main": [[{"node": "Read Middleware Command Result", "type": "main", "index": 0}]]},
+    "Read Middleware Command Result": {"main": [[{"node": "Complete Middleware Job", "type": "main", "index": 0}]]}
+  },
+  "pinData": {},
+  "meta": {
+    "codestra": {
+      "workflow_group": "CP-ODOO-*",
+      "workflow_key": "CP-ODOO-CRM-STATE-SYNC",
+      "depends_on": ["CP-COMMON-ERROR-HANDLER"],
+      "contract_version": 2,
+      "activation_state": "DISABLED",
+      "network_policy": "MIDDLEWARE_ONLY",
+      "endpoint_binding": "UNVERIFIED_TEMPLATE_ONLY",
+      "credential_binding": "NO_CREDENTIALS",
+      "credentials_location": "N8N_CREDENTIAL_STORE_ONLY",
+      "direct_service_access": false,
+      "staging_delivery_flags": "OFF",
+      "runtime_sequence": ["claim", "heartbeat", "record-step", "command", "read-command", "complete-or-fail"]
+    }
+  },
+  "tags": ["CP-ODOO"]
+}

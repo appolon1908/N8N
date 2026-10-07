@@ -1,0 +1,88 @@
+{
+  "schema_version": "1.0",
+  "status": "UNVERIFIED",
+  "verified_at": null,
+  "verified_by": null,
+  "independent_reviewer": null,
+  "evidence_sha256": null,
+  "server": {
+    "expected_public_ip": "65.109.65.169",
+    "expected_private_ip": "10.40.0.1",
+    "expected_hostname": null,
+    "source": "prior-inventory-candidate",
+    "status": "UNVERIFIED",
+    "evidence_sha256": null
+  },
+  "paths": [
+    {
+      "id": "repository_checkout",
+      "required": true,
+      "expected": "/root/codestra-production-completion",
+      "kind": "directory",
+      "status": "CANDIDATE",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "n8n_compose",
+      "required": true,
+      "expected": null,
+      "kind": "file",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "n8n_data",
+      "required": true,
+      "expected": null,
+      "kind": "directory-or-volume",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "n8n_environment",
+      "required": true,
+      "expected": null,
+      "kind": "secret-provider-reference",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "reverse_proxy_config",
+      "required": true,
+      "expected": null,
+      "kind": "file-or-directory",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "postgres_backup",
+      "required": true,
+      "expected": null,
+      "kind": "directory-or-object-store",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    },
+    {
+      "id": "n8n_state_backup",
+      "required": true,
+      "expected": null,
+      "kind": "directory-or-object-store",
+      "status": "UNVERIFIED",
+      "owner": null,
+      "mode": null,
+      "evidence_sha256": null
+    }
+  ]
+}

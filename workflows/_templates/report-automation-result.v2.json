@@ -1,0 +1,13 @@
+{
+  "name": "shared.report-automation-result.v2",
+  "nodes": [
+    {"parameters":{},"id":"140c1b78-fea3-4dfb-8c05-c34b3ed6c2b0","name":"Manual Trigger","type":"n8n-nodes-base.manualTrigger","typeVersion":1,"position":[-500,0]},
+    {"parameters":{"assignments":{"assignments":[{"id":"73b3c6fd-42c0-4db4-b381-b94f14cd420e","name":"run_id","value":"={{$execution.id}}","type":"string"},{"id":"a75cd0e6-a54c-42ad-9f9a-04ec21add22a","name":"status","value":"DRY_RUN_COMPLETE","type":"string"},{"id":"a8b39003-50d7-4cd6-92ca-b3e1177b185d","name":"correlation_id","value":"={{$execution.id}}","type":"string"}]},"options":{}},"id":"02642eae-e493-49fd-aa0e-b47767b1d3be","name":"Prepare Result","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[-260,0]},
+    {"parameters":{"method":"POST","url":"https://middleware.invalid/v2/automation/jobs/template-job/complete","sendBody":true,"contentType":"raw","rawContentType":"application/json","body":"={{JSON.stringify($json)}}","options":{"timeout":10000}},"id":"2b5e04a2-7d65-4e16-8509-f94ae661986e","name":"Report Through Middleware","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[20,0],"disabled":true}
+  ],
+  "connections":{"Manual Trigger":{"main":[[{"node":"Prepare Result","type":"main","index":0}]]},"Prepare Result":{"main":[[{"node":"Report Through Middleware","type":"main","index":0}]]}},
+  "pinData":{},"active":false,
+  "settings":{"executionOrder":"v1","saveDataSuccessExecution":"none","saveManualExecutions":false},
+  "versionId":"92da37e7-08c0-4917-88a5-ab7a54182c47",
+  "meta":{"codestra":{"shared_runtime":true,"contract_version":2,"activation_state":"DISABLED","network_policy":"MIDDLEWARE_ONLY","endpoint_binding":"UNVERIFIED_TEMPLATE_ONLY","credential_binding":"NO_CREDENTIALS"}},"tags":[]
+}

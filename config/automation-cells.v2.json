@@ -1,0 +1,39 @@
+{
+  "schema_version": "2.0",
+  "state": "DESIGN_ONLY",
+  "cells": [
+    {
+      "id": "n8n-core",
+      "database": "n8n_core",
+      "redis_namespace": "n8n:core",
+      "machine_client": "n8n-core-automation",
+      "workflow_families": ["platform", "identity", "crm", "email.klyrow", "sms.telnexa", "social.postly", "crawler.kyqra", "forms", "provisioning"],
+      "allowed_egress": ["middleware-core.internal.invalid"]
+    },
+    {
+      "id": "n8n-beyvra",
+      "database": "n8n_beyvra",
+      "redis_namespace": "n8n:beyvra",
+      "machine_client": "n8n-beyvra-automation",
+      "workflow_families": ["product.beyvra-platform"],
+      "allowed_egress": ["middleware-beyvra.internal.invalid"],
+      "forbidden_command_prefixes": ["trade.", "order.", "wallet.", "ledger.", "hold.", "payment.", "withdrawal.", "deposit.", "transfer.", "custody.", "chain.", "broker.", "provider."]
+    },
+    {
+      "id": "n8n-contact-center",
+      "database": "n8n_contact_center",
+      "redis_namespace": "n8n:contact-center",
+      "machine_client": "n8n-contact-center-automation",
+      "workflow_families": ["telephony", "crm.contact-center"],
+      "allowed_egress": ["middleware-telephony.internal.invalid"],
+      "public_webhooks": false
+    }
+  ],
+  "invariants": {
+    "direct_provider_access": false,
+    "direct_database_access": false,
+    "public_n8n_webhooks": false,
+    "workflows_active_in_git": false,
+    "credentials_in_git": false
+  }
+}

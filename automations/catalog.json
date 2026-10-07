@@ -1,0 +1,126 @@
+{
+  "schema_version": "1.0",
+  "default_activation": "DISABLED",
+  "automations": [
+    {
+      "id": "codestra.crm.lead-intake.v1",
+      "product": "codestra-core",
+      "service": "odoo-19",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/crm/lead-intake",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": false
+    },
+    {
+      "id": "codestra.crm.callback-schedule.v1",
+      "product": "codestra-core",
+      "service": "odoo-19",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/crm/callbacks",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": false
+    },
+    {
+      "id": "codestra.telephony.call-result.v1",
+      "product": "codestra-core",
+      "service": "vicidial",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/telephony/call-results",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": false
+    },
+    {
+      "id": "telnexa.sms.delivery-reconcile.v1",
+      "product": "telnexa",
+      "service": "jasmin",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/sms/delivery-results",
+      "external_effect": false,
+      "state": "DESIGN_ONLY",
+      "human_review": false
+    },
+    {
+      "id": "klyrow.email.delivery-reconcile.v1",
+      "product": "klyrow",
+      "service": "postal-klyrow",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/email/delivery-results",
+      "external_effect": false,
+      "state": "DESIGN_ONLY",
+      "human_review": false
+    },
+    {
+      "id": "kyqra.crawler.job-result.v1",
+      "product": "kyqra",
+      "service": "kyqra",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/crawler/job-results",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "moneybee.application.intake.v1",
+      "product": "moneybee",
+      "service": "codestra-middleware",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/moneybee/applications",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "breero.marketplace.lead-route.v1",
+      "product": "breero",
+      "service": "codestra-middleware",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/breero/leads",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "larim-a.booking.dispatch.v1",
+      "product": "larim-a",
+      "service": "codestra-middleware",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/larim-a/bookings",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "freight.shipment.exception.v1",
+      "product": "freight-platform",
+      "service": "codestra-middleware",
+      "trigger": "middleware-event",
+      "middleware_route": "/v1/automation/freight/exceptions",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "codestra.operations.dead-letter-review.v1",
+      "product": "codestra-core",
+      "service": "codestra-middleware",
+      "trigger": "operator-approved",
+      "middleware_route": "/v1/operations/dead-letters",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    },
+    {
+      "id": "codestra.privacy.suppression-delete.v1",
+      "product": "codestra-core",
+      "service": "codestra-middleware",
+      "trigger": "operator-approved",
+      "middleware_route": "/v1/privacy/requests",
+      "external_effect": true,
+      "state": "DESIGN_ONLY",
+      "human_review": true
+    }
+  ]
+}

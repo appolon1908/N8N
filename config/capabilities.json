@@ -1,0 +1,20 @@
+{
+  "schema_version": "1.0",
+  "safety_mode": "SOURCE_ONLY",
+  "capabilities": {
+    "LIVE_WRITE": false,
+    "ODOO_WRITE": false,
+    "N8N_DELIVERY_ENABLED": false,
+    "ENABLE_EXTERNAL_DELIVERY": false,
+    "CALLBACK_DISPATCH": false,
+    "ORDER_ORCHESTRATION_ENABLED": false,
+    "N8N_ORDER_DISPATCH_ENABLED": false,
+    "PRODUCTION_DIALING": false,
+    "SMS_SEND": false,
+    "EMAIL_SEND": false,
+    "LEAD_PUBLISH": false,
+    "CRAWLER_WRITEBACK": false,
+    "PAYMENT_EXECUTION": false,
+    "DEAD_LETTER_REPLAY": false
+  }
+}

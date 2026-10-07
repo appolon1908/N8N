@@ -1,0 +1,714 @@
+openapi: 3.1.0
+info:
+  title: Codestra Middleware Automation Control API
+  version: 2.1.0
+  description: >-
+    Private control API used by governed n8n workflows. Middleware remains the
+    durable job, command, tenant, actor, policy, idempotency, capability,
+    approval, dead-letter, adapter and reconciliation authority.
+  x-codestra-operation-policy: operation-policy.v2.json
+servers:
+  - url: https://middleware.internal.invalid
+    description: Placeholder only; the effective private endpoint must be verified.
+paths:
+  /v2/automation/jobs/claim:
+    post:
+      operationId: claimAutomationJob
+      summary: Atomically claim one wake-bound durable automation job
+      security:
+        - oauth2ClientCredentials: [automation.job.claim]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JobClaimRequest'
+      responses:
+        '200':
+          description: Claimed job with authoritative context and lease
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationJob'
+        '409':
+          description: Delivery-token, workflow-family, capability, lease or state conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/automation/jobs/{job_id}:
+    get:
+      operationId: getAutomationJob
+      security:
+        - oauth2ClientCredentials: [automation.job.read]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      responses:
+        '200':
+          description: Current durable job state in the caller's workflow family
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationJob'
+        '404':
+          description: Job not found in caller scope
+  /v2/automation/jobs/{job_id}/heartbeat:
+    post:
+      operationId: heartbeatAutomationJob
+      security:
+        - oauth2ClientCredentials: [automation.job.heartbeat]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartbeatRequest'
+      responses:
+        '200':
+          description: Lease extended
+        '409':
+          description: Lease lost, stale execution or terminal state
+  /v2/automation/jobs/{job_id}/steps:
+    post:
+      operationId: recordAutomationStep
+      security:
+        - oauth2ClientCredentials: [automation.job.step.write]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StepRecord'
+      responses:
+        '202':
+          description: Step evidence recorded idempotently under the active lease
+        '409':
+          description: Stale lease, step idempotency conflict or terminal state
+  /v2/automation/jobs/{job_id}/complete:
+    post:
+      operationId: completeAutomationJob
+      security:
+        - oauth2ClientCredentials: [automation.job.complete]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TerminalResult'
+      responses:
+        '200':
+          description: Job completed or exact terminal replay returned
+        '409':
+          description: Stale lease or conflicting terminal result
+  /v2/automation/jobs/{job_id}/fail:
+    post:
+      operationId: failAutomationJob
+      security:
+        - oauth2ClientCredentials: [automation.job.fail]
+      parameters:
+        - $ref: '#/components/parameters/JobId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FailureResult'
+      responses:
+        '200':
+          description: Retry, terminal failure or dead-letter state assigned
+        '409':
+          description: Stale lease or conflicting failure result
+  /v2/automation/commands:
+    post:
+      operationId: requestGovernedCommand
+      summary: Request an idempotent command bound to the active job lease
+      description: >-
+        The exact required domain scope and allowed client are resolved from the
+        command prefix using operation-policy.v2.json. Middleware derives tenant,
+        actor and workflow family from the durable job.
+      security:
+        - oauth2ClientCredentials: [automation.command.identity]
+        - oauth2ClientCredentials: [automation.command.crm]
+        - oauth2ClientCredentials: [automation.command.telephony]
+        - oauth2ClientCredentials: [automation.command.messaging]
+        - oauth2ClientCredentials: [automation.command.social]
+        - oauth2ClientCredentials: [automation.command.crawler]
+        - oauth2ClientCredentials: [automation.command.product]
+        - oauth2ClientCredentials: [automation.command.privacy]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandEnvelope'
+      responses:
+        '202':
+          description: New command accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandReceipt'
+        '200':
+          description: Exact replay returned the existing command result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandReceipt'
+        '403':
+          description: Scope, client, workflow family, policy, capability or approval denied
+        '409':
+          description: Lease, workflow-context or idempotency conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /v2/automation/commands/{command_id}:
+    get:
+      operationId: getGovernedCommand
+      security:
+        - oauth2ClientCredentials: [automation.command.read]
+      parameters:
+        - name: command_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current command state and safe result in caller scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandReceipt'
+        '404':
+          description: Command not found in caller scope
+  /v2/automation/approvals:
+    post:
+      operationId: createApprovalRequest
+      security:
+        - oauth2ClientCredentials: [automation.approval.request]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalRequest'
+      responses:
+        '201':
+          description: Approval request created or exact replay returned
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalState'
+        '409':
+          description: Approval idempotency or job-state conflict
+  /v2/automation/approvals/{approval_id}:
+    get:
+      operationId: getApprovalState
+      security:
+        - oauth2ClientCredentials: [automation.approval.read]
+      parameters:
+        - name: approval_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Current approval state in caller scope
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalState'
+  /v2/automation/dead-letters/{dead_letter_id}/replay:
+    post:
+      operationId: requestDeadLetterReplay
+      summary: Request, but do not self-authorize, a governed replay
+      security:
+        - oauth2ClientCredentials: [automation.operations.replay.request]
+      parameters:
+        - name: dead_letter_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReplayRequest'
+      responses:
+        '202':
+          description: Replay request accepted after all protected controls
+        '403':
+          description: Approval, capability, tenant or safe-replay policy denied
+        '409':
+          description: Version, fingerprint, idempotency or replay-state conflict
+  /v2/automation/jobs/reconcile:
+    post:
+      operationId: reconcileAutomationJobs
+      security:
+        - oauth2ClientCredentials: [automation.operations.reconcile]
+      responses:
+        '202':
+          description: Read-only or plan-only reconciliation run started
+  /v2/automation/capabilities/{capability}:
+    get:
+      operationId: getCapabilityState
+      security:
+        - oauth2ClientCredentials: [automation.capability.read]
+      parameters:
+        - name: capability
+          in: path
+          required: true
+          schema:
+            type: string
+            pattern: '^[A-Z0-9_]+$'
+      responses:
+        '200':
+          description: Safe effective capability state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityState'
+components:
+  securitySchemes:
+    oauth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.codestra.co/realms/codestra/protocol/openid-connect/token
+          scopes:
+            automation.job.claim: Claim a wake-bound job in an allowed workflow family
+            automation.job.read: Read a job in an allowed workflow family
+            automation.job.heartbeat: Extend the active execution lease
+            automation.job.step.write: Record safe step evidence under the active lease
+            automation.job.complete: Complete a job under the active lease
+            automation.job.fail: Fail or schedule retry under the active lease
+            automation.command.read: Read a command in the caller's command family
+            automation.command.identity: Request identity or provisioning commands
+            automation.command.crm: Request CRM or support commands
+            automation.command.telephony: Request telephony commands
+            automation.command.messaging: Request email or SMS commands
+            automation.command.social: Request Postly/social commands
+            automation.command.crawler: Request crawler commands
+            automation.command.product: Request allowlisted product commands
+            automation.command.privacy: Request privacy commands
+            automation.approval.request: Request an approval allowed for the job family
+            automation.approval.read: Read approval state in the job family
+            automation.capability.read: Read safe effective capability state
+            automation.operations.reconcile: Start plan/read-only reconciliation
+            automation.dead-letter.read: Read dead-letter metadata in operations scope
+            automation.operations.replay.request: Request a protected replay
+  parameters:
+    JobId:
+      name: job_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    ActorContext:
+      type: object
+      additionalProperties: false
+      readOnly: true
+      required: [kind, subject]
+      properties:
+        kind:
+          type: string
+          enum: [human, service, system]
+        issuer:
+          type: [string, 'null']
+          maxLength: 300
+        subject:
+          type: string
+          minLength: 1
+          maxLength: 300
+    JobClaimRequest:
+      type: object
+      additionalProperties: false
+      required: [job_id, delivery_token, workflow_key, workflow_version, execution_id]
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        delivery_token:
+          type: string
+          minLength: 32
+          maxLength: 1024
+          description: One-use wake-bound token
+        workflow_key:
+          type: string
+          minLength: 5
+          maxLength: 180
+        workflow_version:
+          type: integer
+          minimum: 1
+        execution_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        lease_seconds:
+          type: integer
+          minimum: 30
+          maximum: 900
+          default: 120
+    AutomationJob:
+      type: object
+      additionalProperties: false
+      required:
+        - job_id
+        - tenant_id
+        - actor_context
+        - workflow_key
+        - workflow_family
+        - workflow_version
+        - state
+        - payload
+        - correlation_id
+        - lease_token
+        - lease_expires_at
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        tenant_id:
+          type: string
+          readOnly: true
+        actor_context:
+          $ref: '#/components/schemas/ActorContext'
+        workflow_key:
+          type: string
+        workflow_family:
+          type: string
+          readOnly: true
+        workflow_version:
+          type: integer
+        state:
+          type: string
+          enum:
+            - PENDING
+            - DISPATCHING
+            - CLAIMED
+            - RUNNING
+            - WAITING_APPROVAL
+            - WAITING_TIMER
+            - WAITING_COMMAND
+            - RETRY_SCHEDULED
+            - COMPLETED
+            - FAILED_TERMINAL
+            - DEAD_LETTER
+            - CANCELLED
+        attempt:
+          type: integer
+          minimum: 0
+        max_attempts:
+          type: integer
+          minimum: 1
+        lease_token:
+          type: string
+        lease_expires_at:
+          type: string
+          format: date-time
+        correlation_id:
+          type: string
+        causation_id:
+          type: [string, 'null']
+        payload:
+          type: object
+        policy_snapshot:
+          type: object
+          readOnly: true
+    HeartbeatRequest:
+      type: object
+      additionalProperties: false
+      required: [lease_token, execution_id]
+      properties:
+        lease_token:
+          type: string
+        execution_id:
+          type: string
+        extend_seconds:
+          type: integer
+          minimum: 30
+          maximum: 900
+          default: 120
+    StepRecord:
+      type: object
+      additionalProperties: false
+      required:
+        - lease_token
+        - execution_id
+        - step_key
+        - step_state
+        - idempotency_key
+        - recorded_at
+      properties:
+        lease_token:
+          type: string
+        execution_id:
+          type: string
+          maxLength: 128
+        step_key:
+          type: string
+          maxLength: 180
+        step_state:
+          type: string
+          enum: [STARTED, COMPLETED, SKIPPED, FAILED, WAITING]
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 180
+        recorded_at:
+          type: string
+          format: date-time
+        safe_metadata:
+          type: object
+    CommandEnvelope:
+      type: object
+      additionalProperties: false
+      required:
+        - job_id
+        - lease_token
+        - execution_id
+        - workflow_key
+        - workflow_version
+        - step_key
+        - event_id
+        - correlation_id
+        - causation_id
+        - idempotency_key
+        - command_type
+        - command_version
+        - occurred_at
+        - payload
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        lease_token:
+          type: string
+        execution_id:
+          type: string
+          maxLength: 128
+        workflow_key:
+          type: string
+          maxLength: 180
+        workflow_version:
+          type: integer
+          minimum: 1
+        step_key:
+          type: string
+          maxLength: 180
+        event_id:
+          type: string
+          format: uuid
+        correlation_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        causation_id:
+          type: string
+          minLength: 1
+          maxLength: 128
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 180
+        command_type:
+          type: string
+          pattern: '^[a-z0-9]+(?:[.-][a-z0-9]+)*$'
+          maxLength: 180
+        command_version:
+          type: integer
+          minimum: 1
+        occurred_at:
+          type: string
+          format: date-time
+        not_before:
+          type: [string, 'null']
+          format: date-time
+        expires_at:
+          type: [string, 'null']
+          format: date-time
+        dry_run:
+          type: boolean
+          default: false
+        payload:
+          type: object
+    TerminalResult:
+      type: object
+      additionalProperties: false
+      required: [lease_token, execution_id, result_code]
+      properties:
+        lease_token:
+          type: string
+        execution_id:
+          type: string
+        result_code:
+          type: string
+          maxLength: 128
+        safe_result:
+          type: object
+    FailureResult:
+      type: object
+      additionalProperties: false
+      required: [lease_token, execution_id, error_code, retryable]
+      properties:
+        lease_token:
+          type: string
+        execution_id:
+          type: string
+        error_code:
+          type: string
+          maxLength: 128
+        retryable:
+          type: boolean
+        retry_after_seconds:
+          type: [integer, 'null']
+          minimum: 0
+          maximum: 86400
+        safe_message:
+          type: [string, 'null']
+          maxLength: 1000
+    CommandReceipt:
+      type: object
+      additionalProperties: false
+      required: [command_id, job_id, state, correlation_id, idempotency_key]
+      properties:
+        command_id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum: [ACCEPTED, BLOCKED, SUBMITTED, UNKNOWN, COMPLETED, FAILED, CANCELLED]
+        correlation_id:
+          type: string
+        idempotency_key:
+          type: string
+        provider_reference:
+          type: [string, 'null']
+          maxLength: 256
+        safe_result:
+          type: [object, 'null']
+    ApprovalRequest:
+      type: object
+      additionalProperties: false
+      required: [job_id, approval_type, summary, expires_at, idempotency_key]
+      properties:
+        job_id:
+          type: string
+          format: uuid
+        approval_type:
+          type: string
+          maxLength: 128
+        summary:
+          type: string
+          minLength: 5
+          maxLength: 1000
+        expires_at:
+          type: string
+          format: date-time
+        required_approvals:
+          type: integer
+          minimum: 1
+          maximum: 2
+          default: 1
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 180
+    ApprovalState:
+      type: object
+      additionalProperties: false
+      required: [approval_id, job_id, state]
+      properties:
+        approval_id:
+          type: string
+          format: uuid
+        job_id:
+          type: string
+          format: uuid
+        state:
+          type: string
+          enum: [PENDING, APPROVED, REJECTED, EXPIRED, CANCELLED]
+        decided_at:
+          type: [string, 'null']
+          format: date-time
+    ReplayRequest:
+      type: object
+      additionalProperties: false
+      required:
+        - approval_id
+        - idempotency_key
+        - expected_version
+        - original_effect_fingerprint
+        - safe_replay_classification
+        - replay_reason
+      properties:
+        approval_id:
+          type: string
+          format: uuid
+        idempotency_key:
+          type: string
+          minLength: 8
+          maxLength: 180
+        expected_version:
+          type: integer
+          minimum: 1
+        original_effect_fingerprint:
+          type: string
+          pattern: '^[0-9a-f]{64}$'
+        safe_replay_classification:
+          type: string
+          enum:
+            - READ_ONLY_RECONCILIATION
+            - IDEMPOTENT_STATE_PROJECTION
+            - CANCEL_IF_NOT_SUBMITTED
+            - EXTERNAL_EFFECT_REQUIRES_TWO_PERSON
+        replay_reason:
+          type: string
+          minLength: 8
+          maxLength: 500
+    CapabilityState:
+      type: object
+      additionalProperties: false
+      required: [name, enabled]
+      properties:
+        name:
+          type: string
+        enabled:
+          type: boolean
+        reason:
+          type: [string, 'null']
+        evidence_id:
+          type: [string, 'null']
+    Error:
+      type: object
+      additionalProperties: false
+      required: [code, message, request_id]
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        request_id:
+          type: string
+        correlation_id:
+          type: [string, 'null']
+        details:
+          type: [object, 'null']

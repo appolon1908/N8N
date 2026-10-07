@@ -1,0 +1,1 @@
+{"schema_version":"2.0","pack":"identity.provisioning","cell":"n8n-core","branch":"automation/identity-keycloak-v2-20260827","workflows":["identity.tenant-provisioning.v1","identity.user-invitation.v1","identity.role-change-approval.v1","identity.access-review.v1","identity.deprovisioning.v1","identity.session-revocation.v1"],"direct_system_access":false,"active":false}

@@ -1,0 +1,35 @@
+# Local environment and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.jks
+*.kdbx
+secrets/
+credentials/
+
+# n8n runtime data and exports
+.n8n/
+n8n_data/
+exports/private/
+workflows/**/credentials*.json
+
+# Runtime evidence and generated release material
+evidence/runtime/*.json
+deploy/manifests/release.json
+deploy/rendered/
+*.sbom.json
+*.provenance.json
+
+# Python and editors
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+.vscode/
+.idea/
+.DS_Store

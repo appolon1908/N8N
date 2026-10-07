@@ -1,0 +1,79 @@
+name: deployment-preflight
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Manifest-validation target; this workflow never deploys
+        required: true
+        type: choice
+        default: staging
+        options:
+          - staging
+          - production
+      release_manifest_path:
+        description: Repository-relative immutable release manifest to validate
+        required: true
+        type: string
+        default: deploy/manifests/release.example.json
+      release_manifest_json:
+        description: Optional compact JSON manifest; overrides release_manifest_path
+        required: false
+        type: string
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deployment-preflight-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  preflight-only-no-deploy:
+    name: Validate release manifest without deployment
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      PYTHONDONTWRITEBYTECODE: "1"
+    steps:
+      - name: Check out selected immutable source
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Validate exact source controls and Compose semantics
+        run: |
+          set -Eeuo pipefail
+          python3 -m compileall -q scripts operations tests
+          make validate
+
+      - name: Require verified runtime paths
+        run: |
+          set -Eeuo pipefail
+          python3 scripts/verify_runtime_paths.py --require-verified
+
+      - name: Validate immutable release-manifest assertions
+        env:
+          RELEASE_MANIFEST_PATH: ${{ inputs.release_manifest_path }}
+          RELEASE_MANIFEST_JSON: ${{ inputs.release_manifest_json }}
+        run: |
+          set -Eeuo pipefail
+          manifest_path="$RELEASE_MANIFEST_PATH"
+          if [ -n "$RELEASE_MANIFEST_JSON" ]; then
+            manifest_path="$RUNNER_TEMP/release-manifest.json"
+            printf '%s' "$RELEASE_MANIFEST_JSON" > "$manifest_path"
+          fi
+          python3 scripts/release_manifest_schema_check.py \
+            --path "$manifest_path" \
+            --target "${{ inputs.target }}"
+
+      - name: Record non-deployment boundary
+        run: |
+          set -Eeuo pipefail
+          echo "PREFLIGHT_MANIFEST_VALIDATION=PASS"
+          echo "EVIDENCE_ARTIFACT_VERIFICATION=SEPARATE_PROTECTED_JOB_REQUIRED"
+          echo "LIVE_SERVER_CHANGED=NO"
+          echo "DEPLOYMENT_PERFORMED=NO"

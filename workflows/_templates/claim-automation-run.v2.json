@@ -1,0 +1,13 @@
+{
+  "name": "shared.claim-automation-run.v2",
+  "nodes": [
+    {"parameters":{},"id":"65ab90ce-1551-4eb6-88fc-691152db6f3a","name":"Manual Trigger","type":"n8n-nodes-base.manualTrigger","typeVersion":1,"position":[-500,0]},
+    {"parameters":{"assignments":{"assignments":[{"id":"222cf55e-9d7c-4e5a-8246-54fd737bb82e","name":"job_id","value":"={{$execution.id}}","type":"string"},{"id":"9c43100a-9e20-4436-b558-254ba5200022","name":"workflow_key","value":"shared.claim-automation-run.v2","type":"string"},{"id":"aac2b9e5-9a6f-4783-8b46-03fa3be733cb","name":"workflow_version","value":2,"type":"number"},{"id":"bd288fdc-e0fd-47d9-803f-c9a4947e8128","name":"execution_id","value":"={{$execution.id}}","type":"string"}]},"options":{}},"id":"77efec6a-7446-471a-a4be-c2a4769015a8","name":"Prepare Claim","type":"n8n-nodes-base.set","typeVersion":3.4,"position":[-260,0]},
+    {"parameters":{"method":"POST","url":"https://middleware.invalid/v2/automation/jobs/claim","sendBody":true,"contentType":"raw","rawContentType":"application/json","body":"={{JSON.stringify($json)}}","options":{"timeout":10000}},"id":"07b83c48-79e4-4a1c-9648-c80772283991","name":"Claim Through Middleware","type":"n8n-nodes-base.httpRequest","typeVersion":4.2,"position":[20,0],"disabled":true}
+  ],
+  "connections":{"Manual Trigger":{"main":[[{"node":"Prepare Claim","type":"main","index":0}]]},"Prepare Claim":{"main":[[{"node":"Claim Through Middleware","type":"main","index":0}]]}},
+  "pinData":{},"active":false,
+  "settings":{"executionOrder":"v1","saveDataSuccessExecution":"none","saveManualExecutions":false},
+  "versionId":"b09dc37a-56fd-4826-81d9-1f32d364eaef",
+  "meta":{"codestra":{"shared_runtime":true,"contract_version":2,"activation_state":"DISABLED","network_policy":"MIDDLEWARE_ONLY","endpoint_binding":"UNVERIFIED_TEMPLATE_ONLY","credential_binding":"NO_CREDENTIALS"}},"tags":[]
+}
