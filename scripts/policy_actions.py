@@ -9,7 +9,7 @@ HEX_SHA = re.compile(r"^[0-9a-f]{40}$")
 USES_ANY = re.compile(r"^\s*-?\s*uses:\s*([^\s#]+)")
 USES_PINNED = re.compile(r"^\s*-?\s*uses:\s*([^@\s#]+)@([^\s#]+)")
 DEPLOY_READINESS_ACTION = (
-    "appolon1908-hue/Infustruction-repo/"
+    "appolon1908/Infustruction-repo/"
     ".github/workflows/reusable-codestra-deploy-readiness.yml"
 )
 DEPLOY_READINESS_SHA = "1b4a90810eb03db3eae2b676b2d418daa434ec16"
